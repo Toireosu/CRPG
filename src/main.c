@@ -1,0 +1,28 @@
+#include "data/game.h"
+#include "data/scene.h"
+#include "systems/game_runner.h"
+#include "systems/window_handler.h"
+#include <stdlib.h>
+
+int main(int argc, char** argv) {
+    WindowHandler_Init();
+
+    Game* game = (Game*)malloc(sizeof(Game));
+
+    Game_Init(game);
+
+    game->scene = (Scene*)malloc(sizeof(Scene));
+    Scene_Init(game->scene); 
+
+    Entity entity;
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 100, 100 });
+
+    Scene_Add(game->scene, entity);
+
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 200, 100 });
+    Scene_Add(game->scene, entity);
+
+    while (!WindowHandler_WindowShouldClose()) {
+        GameRunner_Run(game);
+    }
+}
