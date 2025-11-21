@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include "systems/character_controller.h"
+
 struct {
     void* last_hovered;
 } MouseManager;
@@ -35,6 +37,9 @@ static bool MouseManager_HandleEntities(Game* game) {
 
 void MouseManager_TakeInput(Game* game) {
     // Loop over all entities to check for input
+
+    if (CharacterController_TakeInput(game))
+        return;
 
     if (MouseManager_HandleEntities(game))
         return;

@@ -2,6 +2,7 @@
 #include "data/scene.h"
 #include "systems/game_runner.h"
 #include "systems/window_handler.h"
+#include "systems/character_controller.h"
 #include <stdlib.h>
 
 int main(int argc, char** argv) {
@@ -18,6 +19,8 @@ int main(int argc, char** argv) {
     Entity_Init(&entity, ET_CHARACTER, (Vector2){ 100, 100 });
 
     Scene_Add(game->scene, entity);
+
+    CharacterController_SetCharacter(&game->scene->entities[0]);
 
     Entity_Init(&entity, ET_CHARACTER, (Vector2){ 200, 100 });
     Scene_Add(game->scene, entity);

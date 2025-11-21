@@ -12,6 +12,7 @@ typedef enum EntityType {
 
 typedef struct Entity {
     Vector2 position;
+    Vector2 target_index;
     Vector2 size;
     // Renderable renderable;
     
@@ -19,5 +20,8 @@ typedef struct Entity {
 } Entity;
 
 void Entity_Init(Entity* entity, EntityType type, Vector2 position);
+void Entity_Tick(Entity* entity, float delta);
+void Entity_Move(Entity* entity, Vector2 index);
+
 
 #endif

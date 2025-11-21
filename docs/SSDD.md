@@ -10,7 +10,7 @@ This document describes each core subsystem of the engine and game. It defines r
 6. Item
 7. Inventory
 8. Character UI
-9. Character Controller
+9. Player Controller
 10. Window Handler
 11. Rendering System
 12. Camera System
@@ -19,3 +19,4 @@ This document describes each core subsystem of the engine and game. It defines r
 15. Main Menu
 16. Settings Menu
 17. Event log
+18. Entity Controller
