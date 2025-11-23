@@ -20,3 +20,5 @@ This document describes each core subsystem of the engine and game. It defines r
 16. Settings Menu
 17. Event log
 18. Entity Controller
+19. Animation
+20. Animation Controller

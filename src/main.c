@@ -4,6 +4,7 @@
 #include "systems/window_handler.h"
 #include "systems/character_controller.h"
 #include <stdlib.h>
+#include "systems/renderer.h"
 
 int main(int argc, char** argv) {
     WindowHandler_Init();
@@ -11,6 +12,8 @@ int main(int argc, char** argv) {
     Game* game = (Game*)malloc(sizeof(Game));
 
     Game_Init(game);
+    Renderer_Init();
+
 
     game->scene = (Scene*)malloc(sizeof(Scene));
     Scene_Init(game->scene); 

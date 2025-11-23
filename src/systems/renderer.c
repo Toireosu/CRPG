@@ -1,17 +1,29 @@
 #include "systems/renderer.h"
 #include "data/event_log.h"
 #include "systems/window_handler.h"
-
 #include "raylib.h"
 
+#include "assets/textures_precomped.h"
+
+Texture floor_texture;
+
+void Renderer_Init() {
+
+    Image floor_image = LoadImageFromMemory(".png", precomped_texture_floors, sizeof(precomped_texture_floors));
+    floor_texture = LoadTextureFromImage(floor_image);
+    UnloadImage(floor_image);
+}
+
 static void Renderer_RenderEntity(const Entity* entity) {
-    DrawRectangle(
-        entity->position.x,
-        entity->position.y,
-        16,
-        16,
-        RED
-    );
+    // DrawRectangle(
+    //     entity->position.x,
+    //     entity->position.y,
+    //     16,
+    //     16,
+    //     RED
+    // );
+
+    DrawTexture(floor_texture, entity->position.x, entity->position.y, WHITE);
 }
 
 static void Renderer_RenderScene(Scene* scene) {
