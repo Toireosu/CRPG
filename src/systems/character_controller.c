@@ -1,5 +1,6 @@
 #include "systems/character_controller.h"
 #include "raylib.h"
+#include "systems/world_camera.h"
 
 struct {
     Entity* entity;
@@ -18,7 +19,7 @@ bool CharacterController_TakeInput(Game* game)  {
     Vector2 mouse_position = GetMousePosition();
     
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        Entity_Move(CharacterController.entity, mouse_position);
+        Entity_Move(CharacterController.entity, WorldCamera_ScreenToMap(mouse_position));
         return true;
     }
 

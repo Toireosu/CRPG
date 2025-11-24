@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 #include "systems/character_controller.h"
+#include "systems/world_camera.h"
 
 struct {
     void* last_hovered;
@@ -24,9 +25,9 @@ static bool MouseManager_HandleEntities(Game* game) {
 
     for (int i = 0; i < scene->entities_count; i++) {
         const Entity* entity =  &scene->entities[i];
-        Rectangle rect = (Rectangle) { entity->position.x, entity->position.y, entity->size.x, entity->size.y };
+        Rectangle rect = (Rectangle) { entity->position.x, entity->position.y, 1, 1 };
 
-        if (CheckCollisionPointRec(GetMousePosition(), rect)) {
+        if (CheckCollisionPointRec(WorldCamera_ScreenToMap(GetMousePosition()), rect)) {
 
             if (MouseManager.last_hovered != entity)
                 EventLog_Push(&game->event_log, "You see: An entity.");

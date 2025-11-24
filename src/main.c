@@ -21,15 +21,37 @@ int main(int argc, char** argv) {
     game->scene = (Scene*)malloc(sizeof(Scene));
     Scene_Init(game->scene); 
 
+    // Mock add entities
+
     Entity entity;
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 100, 100 });
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 0, 0 });
 
     Scene_Add(game->scene, entity);
 
     CharacterController_SetCharacter(&game->scene->entities[0]);
 
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 200, 100 });
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 1, 1 });
     Scene_Add(game->scene, entity);
+
+    // Mock setup map
+
+    for (int y = 0; y < game->scene->map.height; y++) {
+        for (int x = 0; x < game->scene->map.width; x++) {
+            Map_SetBackground(&game->scene->map, x, y, 1);
+        }   
+    }
+
+    Map_SetMidground(&game->scene->map, 0, 9, 2, 3);
+    Map_SetMidground(&game->scene->map, 0, 8, 2, 3);    
+    Map_SetMidground(&game->scene->map, 0, 7, 2, 3);    
+
+    Map_SetMidground(&game->scene->map, 0, 9, 3, 2);
+    Map_SetMidground(&game->scene->map, 1, 9, 3, 2);
+    Map_SetMidground(&game->scene->map, 2, 9, 3, 2);
+
+    Map_SetMidground(&game->scene->map, 3, 9, 2, 3);
+    Map_SetMidground(&game->scene->map, 3, 8, 2, 3);    
+    Map_SetMidground(&game->scene->map, 3, 7, 2, 3);    
 
     while (!WindowHandler_WindowShouldClose()) {
         GameRunner_Run(game);

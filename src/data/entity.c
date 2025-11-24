@@ -2,7 +2,7 @@
 
 #include "raymath.h"
 
-#define ENTITY_MOVE_SPEED 400
+#define ENTITY_MOVE_SPEED 4
 
 void Entity_Init(Entity* entity, EntityType type, Vector2 position) {
     entity->position = position;
