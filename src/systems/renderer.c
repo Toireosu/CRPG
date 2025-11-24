@@ -8,9 +8,76 @@
 #include "assets/textures_precomped.h"
 
 #include "raymath.h"
+#include <stdlib.h>
 
 static Texture floor_texture;
 static Texture wall_texture;
+static Texture character_texture;
+
+typedef struct MidgroundSprite {
+    Texture texture;
+    Rectangle source;
+    Vector2 position;
+    Vector2 size;
+    Vector2 origin;
+    int z;
+} MidgroundSprite;
+
+struct MidgroundSpriteStack {
+    MidgroundSprite* sprites;
+    int count;
+    int max_size;
+} sprite_stack;
+
+void Renderer_StackReset() {
+    sprite_stack.count = 0;
+}
+
+int Renderer_CalculateZ(Vector2 coordinate) {
+    return (coordinate.y - coordinate.x) * 2;
+}
+
+static void Renderer_AddSprite(MidgroundSprite sprite) {
+    if (sprite_stack.count >= sprite_stack.max_size) {
+        sprite_stack.max_size *= 2; 
+        sprite_stack.sprites = realloc(sprite_stack.sprites, sprite_stack.max_size * sizeof(MidgroundSprite));
+    }
+
+    sprite_stack.sprites[sprite_stack.count] = sprite;
+    sprite_stack.count++;
+}
+
+static void Renderer_Swap(MidgroundSprite* s0, MidgroundSprite* s1) {
+    MidgroundSprite temp = *s0;
+    *s0 = *s1;
+    *s1 = temp; 
+}
+
+static int Renderer_Partition(int low, int high) {
+    int pivot = sprite_stack.sprites[high].z;
+
+    int i = low - 1;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (sprite_stack.sprites[j].z < pivot) {
+            i++;
+            Renderer_Swap(&sprite_stack.sprites[i], &sprite_stack.sprites[j]);
+        }
+    }
+
+    Renderer_Swap(&sprite_stack.sprites[i + 1], &sprite_stack.sprites[high]);
+    return i + 1;
+}
+
+static void Renderer_SortSprites(int low, int high) {
+    if (low >= high)
+        return;
+        
+    int partition = Renderer_Partition(low, high);
+    
+    Renderer_SortSprites(low, partition - 1);
+    Renderer_SortSprites(partition + 1, high);
+}
 
 void Renderer_Init() {
 
@@ -21,18 +88,36 @@ void Renderer_Init() {
     Image wall_image = LoadImageFromMemory(".png", precomped_texture_walls, sizeof(precomped_texture_walls));
     wall_texture = LoadTextureFromImage(wall_image);
     UnloadImage(wall_image);
+
+    Image character_image = LoadImageFromMemory(".png", precomped_texture_character, sizeof(precomped_texture_character));
+    character_texture = LoadTextureFromImage(character_image);
+    UnloadImage(character_image);
+
+    sprite_stack.sprites = malloc(sizeof(MidgroundSprite) * 20);
+    sprite_stack.count = 0;
+    sprite_stack.max_size = 20;
 }
 
-static void Renderer_RenderEntity(const Entity* entity) {
-    Vector2 w_pos = WorldCamera_MapToScreen(entity->position);
+static void Renderer_CollectEntities(const Scene* scene) {
 
-    DrawRectangle(
-        w_pos.x,
-        w_pos.y,
-        16,
-        16,
-        RED
-    );
+    for (int i = 0; i < scene->entities_count; i++) {
+        const Entity* entity = &scene->entities[i];
+        Vector2 w_pos = WorldCamera_MapToScreen(entity->position);
+    
+        Renderer_AddSprite((MidgroundSprite){
+            .texture = character_texture,
+            .source = (Rectangle){
+                0,
+                0,
+                32,
+                64
+            },
+            .position = w_pos,
+            .size = (Vector2){ 32, 64 },
+            .origin = (Vector2){ 16, 64 },
+            .z = Renderer_CalculateZ(entity->position),
+        });
+    }
 }
 
 static void Renderer_RenderMapBackground(const Map* map) {
@@ -60,7 +145,7 @@ static Vector2 Renderer_GetWallSegmentPosition(int index) {
     return (Vector2){ (x_m * 32) - 16, (y_m * 16) - 8};
 }
 
-static void Renderer_RenderMapMidground(const Map* map) {
+static void Renderer_CollectMapMidground(const Map* map) {
     for (int y = 0; y < map->height; y++) {
         for (int x = 0; x < map->width; x++) {
             WallTile tile = Map_GetMidground(map, x, y);
@@ -70,19 +155,41 @@ static void Renderer_RenderMapMidground(const Map* map) {
                 Vector2 wall_seg_pos = Renderer_GetWallSegmentPosition(i);
                 Vector2 w_pos = WorldCamera_MapToScreen((Vector2){ x, y });
                 w_pos = Vector2Add(w_pos, Renderer_GetWallSegmentPosition(i));
-                
-                // Temp
-                DrawTexturePro(
-                    wall_texture,
-                    (Rectangle) { (i - 1) * 32, 0, 32, 64 },
-                    (Rectangle) { w_pos.x, w_pos.y, 32, 64 },
-                    (Vector2) {16, 56},
-                    0,
-                    WHITE
-                );
+
+                Renderer_AddSprite((MidgroundSprite){
+                    .texture = wall_texture,
+                    .source = (Rectangle){
+                        (i - 1) * 32,
+                        0,
+                        32,
+                        64
+                    },
+                    .position = w_pos,
+                    .size = (Vector2){ 32, 64 },
+                    .origin = (Vector2){ 16, 56 },
+                    .z = Renderer_CalculateZ((Vector2){ x, y }) + (i / 2),
+                });
             }
 
         }
+    }
+}
+
+static void Renderer_RenderMidgroundSprite(MidgroundSprite sprite) {
+    DrawTexturePro(
+        sprite.texture,
+        sprite.source,
+        (Rectangle) {sprite.position.x, sprite.position.y, sprite.size.x, sprite.size.y },
+        sprite.origin,
+        0,
+        WHITE
+    );
+}
+
+static void Renderer_RenderMidground() {
+    for (int i = 0; i < sprite_stack.count; i++) {
+        MidgroundSprite sprite = sprite_stack.sprites[i];
+        Renderer_RenderMidgroundSprite(sprite);
     }
 }
 
@@ -91,13 +198,20 @@ static void Renderer_RenderScene(Scene* scene) {
 
     Renderer_RenderMapBackground(&scene->map);
 
-    Renderer_RenderMapMidground(&scene->map);
 
-    for (int i = 0; i < scene->entities_count; i++) {
-        Entity* entity = &scene->entities[i];
-         
-        Renderer_RenderEntity(entity);
-    }
+    // Restructure
+    // Collect sprites (texture, position, size, z-index)
+    // Sort by Z
+    // Render by order
+
+    Renderer_StackReset();
+
+    Renderer_CollectEntities(scene);
+    Renderer_CollectMapMidground(&scene->map);
+
+    Renderer_SortSprites(0, sprite_stack.count - 1);
+
+    Renderer_RenderMidground();
 }
 
 static void Renderer_RenderUI(Game* game) {
