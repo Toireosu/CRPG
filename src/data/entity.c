@@ -26,5 +26,5 @@ void Entity_Tick(Entity* entity, float delta) {
 }
 
 void Entity_Move(Entity* entity, Vector2 index) {
-    entity->target_index = index;
+    entity->target_index = (Vector2) { (int)(index.x + 0.5f), (int)(index.y + 0.5f) };
 }
