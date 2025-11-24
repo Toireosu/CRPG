@@ -1,3 +1,5 @@
+#define PLATFORM_DESKTOP_GLFW
+
 #include "data/game.h"
 #include "data/scene.h"
 #include "systems/game_runner.h"
@@ -5,6 +7,7 @@
 #include "systems/character_controller.h"
 #include <stdlib.h>
 #include "systems/renderer.h"
+
 
 int main(int argc, char** argv) {
     WindowHandler_Init();
