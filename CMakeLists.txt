@@ -12,7 +12,19 @@ FetchContent_Declare(
     GIT_TAG 5.5
 )
 
+FetchContent_Declare(
+    klib
+    GIT_REPOSITORY https://github.com/attractivechaos/klib
+    GIT_TAG master
+)
+    
 FetchContent_MakeAvailable(raylib)
+    
+FetchContent_MakeAvailable(klib)
+
+add_library(klib INTERFACE)
+
+target_include_directories(klib INTERFACE ${klib_SOURCE_DIR})
 
 file(GLOB_RECURSE SOURCES
     src/*.c
@@ -21,5 +33,5 @@ file(GLOB_RECURSE SOURCES
 add_executable(Falloff ${SOURCES})
 target_include_directories(Falloff PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_link_libraries(Falloff raylib)
+target_link_libraries(Falloff raylib klib)
 

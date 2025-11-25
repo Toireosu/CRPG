@@ -2,6 +2,12 @@
 
 #include <stdlib.h>
 
+#include "khash.h"
+#include "kvec.h"
+#include "ksort.h"
+#include "raymath.h"
+#include <stdio.h>
+
 #define NAV_NODE_MAX_SIBS 4
 
 typedef struct NavNode {
@@ -15,6 +21,14 @@ struct {
     int height;
     NavNode* nodes;
 } path_finding_data;
+
+static bool PathFinding_PositionIsOutside(Vector2 pos) {
+    return pos.x < 0 || pos.y < 0 || pos.x >= path_finding_data.width || pos.y >= path_finding_data.height;
+}
+
+static const int DIR_X[4] = { -1, +1,  0,  0 };
+static const int DIR_Y[4] = {  0,  0, -1, +1 };
+static const int OPPOSITE[4] = { 1, 0, 3, 2 };
 
 void PathFinding_Build(Scene* scene) {
     const Map* map = &scene->map;
@@ -31,7 +45,7 @@ void PathFinding_Build(Scene* scene) {
             char id = Map_GetBackground(map, x, y);
     
             path_finding_data.nodes[x + y * map->width] = (NavNode) {
-                .skip = id ? true : false,
+                .skip = id ? false : true,
                 .position = (Vector2) { x, y },
             };
 
@@ -57,8 +71,8 @@ void PathFinding_Build(Scene* scene) {
                 // Temp: how will we handle doors ?
                 if (n_tile.ids[i]) continue;
 
-                int a_x = x + (ix * 2) - 1;
-                int a_y = y + (iy * 2) - 1;
+                int a_x = x + DIR_X[i];
+                int a_y = y + DIR_Y[i];
 
                 if (a_x < 0 || a_y < 0 || a_x >= map->width || a_y >= map->height)
                     continue;
@@ -67,12 +81,9 @@ void PathFinding_Build(Scene* scene) {
 
                 if (!adj_node->skip) {
 
-                    WallTile a_tile = Map_GetMidground(map, x, y);
+                    WallTile a_tile = Map_GetMidground(map, a_x, a_y);
 
-                    a_x = (ix + 1) % 2;
-                    a_y = (iy + 1) % 2;
-
-                    if (a_tile.ids[a_x + a_y * 2]) continue;
+                    if (a_tile.ids[OPPOSITE[i]]) continue;
 
                     path_finding_data.nodes[x + y * map->width].adjecent[i] = adj_node; 
                 }
@@ -85,12 +96,129 @@ void PathFinding_Build(Scene* scene) {
 bool PathFinding_ClaimIndex(Entity* entity, Vector2 position) { /* TODO */ }
 
 typedef struct NavBuildNode {
-    float g; // distance from start 
-    float h; // distance to end 
-    float f; // sum
-    NavBuildNode* parent;
+    int g; // distance from start 
+    int h; // distance to end 
+    int f; // sum
+    struct NavBuildNode* parent;
+    Vector2 position;
 } NavBuildNode;
 
-Vector2* PathFinding_FindPath(Vector2 from, Vector2 to) {
+static NavBuildNode* NavBuildNode_New(NavNode n, NavBuildNode* parent, Vector2 target_position) {
+    NavBuildNode* nbn = malloc(sizeof(NavBuildNode));
+    nbn->g = parent ? parent->g + 1 : 0;
+    nbn->h = Vector2Distance(n.position, target_position);
+    nbn->f = nbn->g + nbn->h;
+    nbn->parent = parent;
+    nbn->position = n.position;
+    return nbn;
+}
 
+static inline khint_t NavNode_Hash(NavBuildNode* n) {
+    return 73856093 * ((int)n->position.x) ^ 19349663 * ((int)n->position.y);
+} 
+
+static inline int NavNode_Compare(const void* pa, const void* pb) {
+    NavBuildNode *a = *(NavBuildNode**)pa;
+    NavBuildNode *b = *(NavBuildNode**)pb;
+    if (a->f < b->f) return -1;
+    if (a->f > b->f) return 1;
+    return 0;
+} 
+
+static inline int NavNode_Equal(NavBuildNode* a, NavBuildNode* b) {
+    return ((int)a->position.x == (int)b->position.x) &&
+           ((int)a->position.y == (int)b->position.y);
+} 
+
+KHASH_INIT(NavNodeSet, NavBuildNode*, char, false, NavNode_Hash, NavNode_Equal)
+
+NavPath PathFinding_FindPath(Vector2 from, Vector2 to) {
+    to = (Vector2){ (int)to.x, (int)to.y };
+    if (PathFinding_PositionIsOutside(from)) return (NavPath){ .success = false, .data.reason = "Error: Entity outside of bounds!" };
+    if (PathFinding_PositionIsOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };;
+
+    NavNode from_node = path_finding_data.nodes[(int)from.x + (int)from.y * path_finding_data.width]; 
+    NavNode to_node = path_finding_data.nodes[(int)to.x + (int)to.y * path_finding_data.width]; 
+
+    if (from_node.skip) return (NavPath){ .success = false, .data.reason = "Error: Entity on non-nav tile!" };
+    if (to_node.skip) return (NavPath){ .success = false, .data.reason = "Can't get there!" };
+
+    
+    khash_t(NavNodeSet) *closed = kh_init(NavNodeSet);
+    kvec_t(NavBuildNode*) open;
+    kv_init(open);
+    
+    
+    kv_push(NavBuildNode*, open, NavBuildNode_New(from_node, NULL, to));
+    printf("From: %f, %f\n", from_node.position.x, from_node.position.y);
+    printf("To: %f, %f\n", to_node.position.x, to_node.position.y);
+    // Maybe we could allocat memory on stack for all potential node? And then migrate them to heap later?
+
+    while (kv_size(open) > 0) {
+        qsort(open.a, kv_size(open), sizeof(NavBuildNode*), NavNode_Compare);
+        NavBuildNode* current = open.a[0];
+        NavNode current_m = path_finding_data.nodes[(int)current->position.x + (int)current->position.y * path_finding_data.width];
+        
+        
+        open.a[0] = open.a[kv_size(open) - 1];
+        kv_pop(open);
+        int r;
+        kh_put(NavNodeSet, closed, current, &r);
+        
+        if (Vector2Equals(current->position, to_node.position)) {
+            // Rebuild path and return
+            // Free all used data
+            
+            
+            // Remove all needed nodes from closed
+            
+            NavPath path = (NavPath){ 
+                .success = true, 
+            };
+            
+            kv_init(path.data.path);
+            
+            while (current) {
+                kv_push(Vector2, path.data.path, current->position);
+                current = current->parent;
+            }
+            
+            for (int i = 0; i < kv_size(open); i++) free(open.a[i]);
+            kv_destroy(open);
+            
+            NavBuildNode* k;
+            char v;
+            // kh_foreach(closed, k, v, free(k));
+            kh_destroy(NavNodeSet, closed);
+            
+            return path;
+        }
+
+        for (int i = 0; i < NAV_NODE_MAX_SIBS; i++) {
+            NavNode* sib_node = current_m.adjecent[i];
+
+            if (!sib_node) continue;
+
+            NavBuildNode* sbn = NavBuildNode_New(*sib_node, current, to);
+
+            khiter_t it = kh_get(NavNodeSet, closed, sbn);
+            if (it != kh_end(closed)) {
+                free(sbn);
+                continue;
+            }
+            
+            kv_push(NavBuildNode*, open, sbn);
+        }
+
+    }
+
+    for (int i = 0; i < kv_size(open); i++) free(open.a[i]);
+    NavBuildNode* k;
+    char v;
+    kh_foreach(closed, k, v, { free(k); });
+
+    kv_destroy(open);
+    kh_destroy(NavNodeSet, closed);
+
+    return (NavPath){ .success = false, .data.reason = "Can't get there!" };
 }

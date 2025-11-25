@@ -7,6 +7,7 @@
 #include "systems/character_controller.h"
 #include <stdlib.h>
 #include "systems/renderer.h"
+#include "systems/path_finding.h"
 
 
 int main(int argc, char** argv) {
@@ -52,6 +53,8 @@ int main(int argc, char** argv) {
     Map_SetMidground(&game->scene->map, 3, 9, 2, 3);
     Map_SetMidground(&game->scene->map, 3, 8, 2, 3);    
     Map_SetMidground(&game->scene->map, 3, 7, 2, 3);    
+
+    PathFinding_Build(game->scene);
 
     while (!WindowHandler_WindowShouldClose()) {
         GameRunner_Run(game);
