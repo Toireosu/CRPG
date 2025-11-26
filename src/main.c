@@ -8,7 +8,25 @@
 #include <stdlib.h>
 #include "systems/renderer.h"
 #include "systems/path_finding.h"
+#include "systems/world_camera.h"
 
+
+void MakeHouse(Game* game, Coordinates v) {
+    Map_SetMidground(&game->scene->map, 0 + v.x, 2 + v.y, 0, 2);
+    Map_SetMidground(&game->scene->map, 0 + v.x, 1 + v.y, 0, 2);    
+    Map_SetMidground(&game->scene->map, 0 + v.x, 0 + v.y, 0, 2);    
+
+    Map_SetMidground(&game->scene->map, 0 + v.x, 2 + v.y, 3, 3);
+    Map_SetMidground(&game->scene->map, 1 + v.x, 2 + v.y, 3, 3);
+    Map_SetMidground(&game->scene->map, 2 + v.x, 2 + v.y, 3, 3);
+
+    Map_SetMidground(&game->scene->map, 2 + v.x, 2 + v.y, 1, 2);
+    Map_SetMidground(&game->scene->map, 2 + v.x, 1 + v.y, 1, 2);    
+    Map_SetMidground(&game->scene->map, 2 + v.x, 0 + v.y, 1, 2); 
+
+    Map_SetMidground(&game->scene->map, 2 + v.x, 0 + v.y, 2, 3);
+    Map_SetMidground(&game->scene->map, 0 + v.x, 0 + v.y, 2, 3);    
+}
 
 int main(int argc, char** argv) {
     WindowHandler_Init();
@@ -22,6 +40,9 @@ int main(int argc, char** argv) {
 
     game->scene = (Scene*)malloc(sizeof(Scene));
     Scene_Init(game->scene); 
+
+    WorldCamera_Init();
+    WorldCamera_SetPosition((Vector2){0, -130});
 
     // Mock add entities
 
@@ -37,26 +58,15 @@ int main(int argc, char** argv) {
 
     // Mock setup map
 
+    MakeHouse(game, (Coordinates){0, 6});
+
+    MakeHouse(game, (Coordinates){6, 4});
+
     for (int y = 0; y < game->scene->map.height; y++) {
         for (int x = 0; x < game->scene->map.width; x++) {
             Map_SetBackground(&game->scene->map, x, y, 1);
         }   
     }
-
-    Map_SetMidground(&game->scene->map, 0, 9, 0, 2);
-    Map_SetMidground(&game->scene->map, 0, 8, 0, 2);    
-    Map_SetMidground(&game->scene->map, 0, 7, 0, 2);    
-
-    Map_SetMidground(&game->scene->map, 0, 9, 3, 3);
-    Map_SetMidground(&game->scene->map, 1, 9, 3, 3);
-    Map_SetMidground(&game->scene->map, 2, 9, 3, 3);
-
-    Map_SetMidground(&game->scene->map, 2, 9, 1, 2);
-    Map_SetMidground(&game->scene->map, 2, 8, 1, 2);    
-    Map_SetMidground(&game->scene->map, 2, 7, 1, 2); 
-
-    Map_SetMidground(&game->scene->map, 2, 7, 2, 3);
-    Map_SetMidground(&game->scene->map, 0, 7, 2, 3);    
 
     PathFinding_Build(game->scene);
 

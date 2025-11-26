@@ -4,6 +4,9 @@
 
 #include "systems/character_controller.h"
 #include "systems/world_camera.h"
+#include "systems/window_handler.h"
+
+#include "raymath.h"
 
 struct {
     void* last_hovered;
@@ -36,10 +39,28 @@ static bool MouseManager_HandleEntities(Game* game) {
     }
 } 
 
+#define SCROLL_FIELD_SIZE 50
+#define SCROLL_SPEED 40
+
+static bool MouseManager_ScrollScreen(Game* game) {
+    if (!game->scene) return false;
+
+    float delta = GetFrameTime();
+
+    Vector2 mouse_position = GetMousePosition();
+    if (mouse_position.x < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED), delta);
+    if (mouse_position.y < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED), delta);
+    if (mouse_position.x > WINDOW_HANDLER_WIDTH - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
+    if (mouse_position.y > WINDOW_HANDLER_HEIGHT - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
+}
+
 void MouseManager_TakeInput(Game* game) {
     // Loop over all entities to check for input
 
     if (CharacterController_TakeInput(game))
+        return;
+
+    if (MouseManager_ScrollScreen(game))
         return;
 
     if (MouseManager_HandleEntities(game))

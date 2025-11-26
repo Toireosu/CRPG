@@ -214,7 +214,7 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
     for (int i = 0; i < kv_size(open); i++) free(open.a[i]);
     NavBuildNode* k;
     char v;
-    kh_foreach(closed, k, v, { free(k); });
+    // kh_foreach(closed, k, v, { free(k); });
 
     kv_destroy(open);
     kh_destroy(NavNodeSet, closed);
