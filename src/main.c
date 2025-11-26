@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
 
     Game_Init(game);
     Renderer_Init();
+    EventLog_Init();
 
 
     game->scene = (Scene*)malloc(sizeof(Scene));
@@ -25,13 +26,13 @@ int main(int argc, char** argv) {
     // Mock add entities
 
     Entity entity;
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 0, 0 });
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 0, 2 });
 
     Scene_Add(game->scene, entity);
 
     CharacterController_SetCharacter(&game->scene->entities[0]);
 
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 1, 1 });
+    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 1, 5 });
     Scene_Add(game->scene, entity);
 
     // Mock setup map

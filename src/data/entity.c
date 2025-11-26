@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "raymath.h"
+#include "data/event_log.h"
 
 #define ENTITY_MOVE_SPEED 4
 
@@ -55,9 +56,8 @@ void Entity_Move(Entity* entity, Vector2 index) {
     
     if (entity->path->success) {
         entity->path_index = kv_size(entity->path->data.path) - 1;
-        printf("Works! %d\n", entity->path_index);
     } else {
-        printf("Doesn't work :/ %s\n", entity->path->data.reason);
+        EventLog_Push(entity->path->data.reason);
     }
 
 

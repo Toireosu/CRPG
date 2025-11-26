@@ -30,7 +30,7 @@ static bool MouseManager_HandleEntities(Game* game) {
         if (CheckCollisionPointRec(WorldCamera_ScreenToMap(GetMousePosition()), rect)) {
 
             if (MouseManager.last_hovered != entity)
-                EventLog_Push(&game->event_log, "You see: An entity.");
+                EventLog_Push("You see: An entity.");
             return MouseManager_Hover((void*)entity);
         }
     }

@@ -5,5 +5,4 @@
 
 void Game_Init(Game* game) {
     game->scene = NULL;
-    EventLog_Init(&game->event_log);
 }

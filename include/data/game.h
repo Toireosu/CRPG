@@ -6,7 +6,6 @@
 
 typedef struct Game {
     Scene* scene;
-    EventLog event_log;
 } Game;
 
 void Game_Init(Game* game);

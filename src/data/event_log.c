@@ -2,20 +2,28 @@
 
 #include <stdlib.h>
 
-void EventLog_Init(EventLog* log) {
+struct {
+    char* data[EVENT_LOG_MAX_COUNT];
+} event_log;
+
+void EventLog_Init() {
+    EventLog_Clear();
+}
+
+void EventLog_Clear() {
     for (int i = 0 - 1; i < EVENT_LOG_MAX_COUNT; i++) {
-        log->data[i] = NULL;
+        event_log.data[i] = NULL;
     }
 }
 
-void EventLog_Push(EventLog* log, char* entry) {
+void EventLog_Push(char* entry) {
     for (int i = EVENT_LOG_MAX_COUNT - 1; i > 0; i--) {
-        log->data[i] = log->data[i - 1];
+        event_log.data[i] = event_log.data[i - 1];
     }
 
-    log->data[0] = entry; 
+    event_log.data[0] = entry; 
 }
 
-char* EventLog_Get(EventLog* log, int index) {
-    return log->data[index];
+char* EventLog_Get(int index) {
+    return event_log.data[index];
 }

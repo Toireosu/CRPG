@@ -222,7 +222,7 @@ static void Renderer_RenderUI(Game* game) {
     // Temp
     for (int i = 0; i < EVENT_LOG_MAX_COUNT; i++) {
         DrawText(
-            EventLog_Get(&game->event_log, i), 
+            EventLog_Get(i), 
             0,
             WINDOW_HANDLER_HEIGHT - i * 20,
             20,
