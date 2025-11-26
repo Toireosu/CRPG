@@ -42,17 +42,20 @@ int main(int argc, char** argv) {
         }   
     }
 
-    Map_SetMidground(&game->scene->map, 0, 9, 2, 3);
-    Map_SetMidground(&game->scene->map, 0, 8, 2, 3);    
+    Map_SetMidground(&game->scene->map, 0, 9, 0, 2);
+    Map_SetMidground(&game->scene->map, 0, 8, 0, 2);    
+    Map_SetMidground(&game->scene->map, 0, 7, 0, 2);    
+
+    Map_SetMidground(&game->scene->map, 0, 9, 3, 3);
+    Map_SetMidground(&game->scene->map, 1, 9, 3, 3);
+    Map_SetMidground(&game->scene->map, 2, 9, 3, 3);
+
+    Map_SetMidground(&game->scene->map, 2, 9, 1, 2);
+    Map_SetMidground(&game->scene->map, 2, 8, 1, 2);    
+    Map_SetMidground(&game->scene->map, 2, 7, 1, 2); 
+
+    Map_SetMidground(&game->scene->map, 2, 7, 2, 3);
     Map_SetMidground(&game->scene->map, 0, 7, 2, 3);    
-
-    Map_SetMidground(&game->scene->map, 0, 9, 3, 2);
-    Map_SetMidground(&game->scene->map, 1, 9, 3, 2);
-    Map_SetMidground(&game->scene->map, 2, 9, 3, 2);
-
-    Map_SetMidground(&game->scene->map, 3, 9, 2, 3);
-    Map_SetMidground(&game->scene->map, 3, 8, 2, 3);    
-    Map_SetMidground(&game->scene->map, 3, 7, 2, 3);    
 
     PathFinding_Build(game->scene);
 

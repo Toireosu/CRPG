@@ -36,7 +36,7 @@ void PathFinding_Build(Scene* scene) {
     path_finding_data.height = map->height;
     int area = map->width * map->height;
 
-    path_finding_data.nodes = calloc(path_finding_data.width * path_finding_data.height, sizeof(NavNode));
+    path_finding_data.nodes = calloc(area, sizeof(NavNode));
 
     // put all tiles in nodes list
 
@@ -64,10 +64,6 @@ void PathFinding_Build(Scene* scene) {
             
             // TODO: memset ??
             for (int i = 0; i < NAV_NODE_MAX_SIBS; i++) {
-                
-                int ix = i % 2; 
-                int iy = i / 2; 
-                
                 // Temp: how will we handle doors ?
                 if (n_tile.ids[i]) continue;
 
@@ -133,7 +129,8 @@ static inline int NavNode_Equal(NavBuildNode* a, NavBuildNode* b) {
 KHASH_INIT(NavNodeSet, NavBuildNode*, char, false, NavNode_Hash, NavNode_Equal)
 
 NavPath PathFinding_FindPath(Vector2 from, Vector2 to) {
-    to = (Vector2){ (int)to.x, (int)to.y };
+    from = (Vector2){ roundl(from.x), roundl(from.y) };
+    to = (Vector2){ roundl(to.x), roundl(to.y) };
     if (PathFinding_PositionIsOutside(from)) return (NavPath){ .success = false, .data.reason = "Error: Entity outside of bounds!" };
     if (PathFinding_PositionIsOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };;
 

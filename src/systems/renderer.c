@@ -139,6 +139,10 @@ static void Renderer_RenderMapBackground(const Map* map) {
     }
 }
 
+static const float DIR_X[4] = { -0.5, 0.5, 0, 0 };
+static const float DIR_Y[4] = { 0, 0, -0.5, 0.5};
+static const float DIR_Z[4] = { 1, -1, -1, 1};
+
 static Vector2 Renderer_GetWallSegmentPosition(int index) {
     int x_m = index % 2;
     int y_m = index / 2;
@@ -153,13 +157,13 @@ static void Renderer_CollectMapMidground(const Map* map) {
             for (int i = 0; i < WALL_TILE_NUM_WALLS; i++) {
                 if (!tile.ids[i]) continue;                
                 Vector2 wall_seg_pos = Renderer_GetWallSegmentPosition(i);
-                Vector2 w_pos = WorldCamera_MapToScreen((Vector2){ x, y });
-                w_pos = Vector2Add(w_pos, Renderer_GetWallSegmentPosition(i));
+                Vector2 w_pos = WorldCamera_MapToScreen((Vector2){ x + DIR_X[i], y + DIR_Y[i] });
+                // w_pos = Vector2Add(w_pos, Renderer_GetWallSegmentPosition(i));
 
                 Renderer_AddSprite((MidgroundSprite){
                     .texture = wall_texture,
                     .source = (Rectangle){
-                        (i - 1) * 32,
+                        (tile.ids[i] - 1) * 32,
                         0,
                         32,
                         64
@@ -167,7 +171,7 @@ static void Renderer_CollectMapMidground(const Map* map) {
                     .position = w_pos,
                     .size = (Vector2){ 32, 64 },
                     .origin = (Vector2){ 16, 56 },
-                    .z = Renderer_CalculateZ((Vector2){ x, y }) + (i / 2),
+                    .z = Renderer_CalculateZ((Vector2){ x, y }) + DIR_Z[i],
                 });
             }
 
