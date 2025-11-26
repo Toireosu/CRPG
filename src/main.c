@@ -26,13 +26,13 @@ int main(int argc, char** argv) {
     // Mock add entities
 
     Entity entity;
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 0, 2 });
+    Entity_Init(&entity, ET_CHARACTER, (Coordinates){ 0, 2 });
 
     Scene_Add(game->scene, entity);
 
     CharacterController_SetCharacter(&game->scene->entities[0]);
 
-    Entity_Init(&entity, ET_CHARACTER, (Vector2){ 1, 5 });
+    Entity_Init(&entity, ET_CHARACTER, (Coordinates){ 1, 5 });
     Scene_Add(game->scene, entity);
 
     // Mock setup map

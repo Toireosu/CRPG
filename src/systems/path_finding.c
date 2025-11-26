@@ -12,7 +12,7 @@
 
 typedef struct NavNode {
     bool skip;
-    Vector2 position;
+    Coordinates position;
     struct NavNode* adjecent[NAV_NODE_MAX_SIBS];
 } NavNode;
 
@@ -22,8 +22,8 @@ struct {
     NavNode* nodes;
 } path_finding_data;
 
-static bool PathFinding_PositionIsOutside(Vector2 pos) {
-    return pos.x < 0 || pos.y < 0 || pos.x >= path_finding_data.width || pos.y >= path_finding_data.height;
+static bool PathFinding_PositionIsOutside(Coordinates coords) {
+    return coords.x < 0 || coords.y < 0 || coords.x >= path_finding_data.width || coords.y >= path_finding_data.height;
 }
 
 static const int DIR_X[4] = { -1, +1,  0,  0 };
@@ -46,7 +46,7 @@ void PathFinding_Build(Scene* scene) {
     
             path_finding_data.nodes[x + y * map->width] = (NavNode) {
                 .skip = id ? false : true,
-                .position = (Vector2) { x, y },
+                .position = (Coordinates) { x, y },
             };
 
             // TODO: memset ??
@@ -89,20 +89,24 @@ void PathFinding_Build(Scene* scene) {
     }
 }
 
-bool PathFinding_ClaimIndex(Entity* entity, Vector2 position) { /* TODO */ }
+bool PathFinding_ClaimIndex(Entity* entity, Coordinates position) { /* TODO */ }
 
 typedef struct NavBuildNode {
     int g; // distance from start 
     int h; // distance to end 
     int f; // sum
     struct NavBuildNode* parent;
-    Vector2 position;
+    Coordinates position;
 } NavBuildNode;
 
-static NavBuildNode* NavBuildNode_New(NavNode n, NavBuildNode* parent, Vector2 target_position) {
+static int Navigation_Hueristic(Coordinates c0, Coordinates c1) {
+    return roundl((abs(c1.x - c0.x) + abs(c1.y - c1.x)) * 0.8); 
+}
+
+static NavBuildNode* NavBuildNode_New(NavNode n, NavBuildNode* parent, Coordinates target_position) {
     NavBuildNode* nbn = malloc(sizeof(NavBuildNode));
     nbn->g = parent ? parent->g + 1 : 0;
-    nbn->h = Vector2Distance(n.position, target_position);
+    nbn->h = Navigation_Hueristic(n.position, target_position);
     nbn->f = nbn->g + nbn->h;
     nbn->parent = parent;
     nbn->position = n.position;
@@ -122,15 +126,13 @@ static inline int NavNode_Compare(const void* pa, const void* pb) {
 } 
 
 static inline int NavNode_Equal(NavBuildNode* a, NavBuildNode* b) {
-    return ((int)a->position.x == (int)b->position.x) &&
-           ((int)a->position.y == (int)b->position.y);
+    return a->position.x == b->position.x &&
+           a->position.y == b->position.y;
 } 
 
 KHASH_INIT(NavNodeSet, NavBuildNode*, char, false, NavNode_Hash, NavNode_Equal)
 
-NavPath PathFinding_FindPath(Vector2 from, Vector2 to) {
-    from = (Vector2){ roundl(from.x), roundl(from.y) };
-    to = (Vector2){ roundl(to.x), roundl(to.y) };
+NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
     if (PathFinding_PositionIsOutside(from)) return (NavPath){ .success = false, .data.reason = "Error: Entity outside of bounds!" };
     if (PathFinding_PositionIsOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };;
 
@@ -162,7 +164,7 @@ NavPath PathFinding_FindPath(Vector2 from, Vector2 to) {
         int r;
         kh_put(NavNodeSet, closed, current, &r);
         
-        if (Vector2Equals(current->position, to_node.position)) {
+        if (Coordinates_Equals(current->position, to_node.position)) {
             // Rebuild path and return
             // Free all used data
             
@@ -176,7 +178,7 @@ NavPath PathFinding_FindPath(Vector2 from, Vector2 to) {
             kv_init(path.data.path);
             
             while (current) {
-                kv_push(Vector2, path.data.path, current->position);
+                kv_push(Coordinates, path.data.path, current->position);
                 current = current->parent;
             }
             

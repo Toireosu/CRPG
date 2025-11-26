@@ -5,17 +5,18 @@
 #include <stdbool.h>
 #include "data/scene.h"
 #include "kvec.h"
+#include "data/coordinates.h"
 
 typedef struct NavPath {
     bool success;
     union {
-        kvec_t(Vector2) path;
+        kvec_t(Coordinates) path;
         const char* reason;
     } data;
 } NavPath;
 
 void PathFinding_Build(Scene* scene);
-bool PathFinding_ClaimIndex(Entity* entity, Vector2 position);
-NavPath PathFinding_FindPath(Vector2 from, Vector2 to);
+bool PathFinding_ClaimIndex(Entity* entity, Coordinates position);
+NavPath PathFinding_FindPath(Coordinates from, Coordinates to);
 
 #endif

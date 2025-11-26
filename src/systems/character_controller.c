@@ -24,7 +24,7 @@ bool CharacterController_TakeInput(Game* game)  {
         map_pos.x = round(map_pos.x);
         map_pos.y = round(map_pos.y);
 
-        Entity_Move(CharacterController.entity, WorldCamera_ScreenToMap(mouse_position));
+        Entity_Move(CharacterController.entity, Coordinates_FromVector2(WorldCamera_ScreenToMap(mouse_position)));
         return true;
     }
 

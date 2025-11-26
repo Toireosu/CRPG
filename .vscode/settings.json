@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        ".vs": "glsl",
+        ".fs": "glsl",
+        "*.m": "c",
+        "chrono": "c",
+        "ranges": "c",
+        "variant": "c"
+    }
+}

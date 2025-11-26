@@ -5,10 +5,10 @@
 #include "raymath.h"
 #include "data/event_log.h"
 
-#define ENTITY_MOVE_SPEED 4
+#define ENTITY_MOVE_SPEED 2
 
-void Entity_Init(Entity* entity, EntityType type, Vector2 position) {
-    entity->position = position;
+void Entity_Init(Entity* entity, EntityType type, Coordinates position) {
+    entity->position = Coordinates_ToVector2(position);
     entity->path = malloc(sizeof(NavPath)); 
     *entity->path = (NavPath) { .success = false, .data.reason = "", };
     entity->size = (Vector2){ 16, 16 };
@@ -28,7 +28,7 @@ void Entity_Tick(Entity* entity, float delta) {
     if (!entity->path->success) return;
 
     
-    Vector2 target_index = kv_A(entity->path->data.path, entity->path_index);
+    Vector2 target_index = Coordinates_ToVector2(kv_A(entity->path->data.path, entity->path_index));
     Vector2 dir = Vector2Subtract(target_index, entity->position);
     Vector2 step =  Vector2Scale(Vector2Normalize(Vector2Subtract(target_index, entity->position)), delta * ENTITY_MOVE_SPEED);
     
@@ -50,16 +50,13 @@ void Entity_Tick(Entity* entity, float delta) {
     }
 }
 
-void Entity_Move(Entity* entity, Vector2 index) {
+void Entity_Move(Entity* entity, Coordinates coords) {
     // TODO: Print message if player 
-    *entity->path = PathFinding_FindPath(entity->position, index);
+    *entity->path = PathFinding_FindPath(Coordinates_FromVector2(entity->position), coords);
     
     if (entity->path->success) {
         entity->path_index = kv_size(entity->path->data.path) - 1;
     } else {
         EventLog_Push(entity->path->data.reason);
     }
-
-
-    // entity->target_index = (Vector2) { (int)(index.x + 0.5f), (int)(index.y + 0.5f) };
 }
