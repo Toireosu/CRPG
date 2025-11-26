@@ -25,7 +25,7 @@ static bool MouseManager_HandleEntities(Game* game) {
 
     for (int i = 0; i < scene->entities_count; i++) {
         const Entity* entity =  &scene->entities[i];
-        Rectangle rect = (Rectangle) { entity->position.x, entity->position.y, 1, 1 };
+        Rectangle rect = (Rectangle) { entity->position.x - 0.25, entity->position.y - 2, 0.5, 2 };
 
         if (CheckCollisionPointRec(WorldCamera_ScreenToMap(GetMousePosition()), rect)) {
 
