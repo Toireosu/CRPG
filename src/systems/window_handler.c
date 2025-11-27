@@ -1,9 +1,10 @@
 #include "systems/window_handler.h"
+#include "data/globs.h"
 
 #include "raylib.h"
 
 void WindowHandler_Init() {
-    InitWindow(WINDOW_HANDLER_WIDTH, WINDOW_HANDLER_HEIGHT, "Falloff");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Falloff");
 }
 
 bool WindowHandler_WindowShouldClose() {

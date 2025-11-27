@@ -6,6 +6,8 @@
 #include "systems/world_camera.h"
 #include "systems/window_handler.h"
 
+#include "data/globs.h"
+
 #include "raymath.h"
 
 struct {
@@ -50,8 +52,8 @@ static bool MouseManager_ScrollScreen(Game* game) {
     Vector2 mouse_position = GetMousePosition();
     if (mouse_position.x < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED), delta);
     if (mouse_position.y < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED), delta);
-    if (mouse_position.x > WINDOW_HANDLER_WIDTH - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
-    if (mouse_position.y > WINDOW_HANDLER_HEIGHT - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
+    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
+    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
 }
 
 void MouseManager_TakeInput(Game* game) {
