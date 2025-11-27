@@ -7,6 +7,7 @@
 #include "ksort.h"
 #include "raymath.h"
 #include <stdio.h>
+#include "data/map.h"
 
 #define NAV_NODE_MAX_SIBS 4
 
@@ -41,54 +42,52 @@ void PathFinding_Build(Scene* scene) {
 
     // put all tiles in nodes list
 
-    for (int y = 0; y < map->height; y++) {
-        for (int x = 0; x < map->width; x++) {
-            char id = Map_GetBackground(map, x, y);
-    
-            path_finding_data.nodes[x + y * map->width] = (NavNode) {
-                .skip = id ? false : true,
-                .occupier = NULL,
-                .position = (Coordinates) { x, y },
-            };
+    Map_ForEachTile(map, ({
+        char id = Map_GetBackground(map, x, y);
 
-            // TODO: memset ??
-            for (int i = 0; i < NAV_NODE_MAX_SIBS; i++)  
-                path_finding_data.nodes[x + y * map->width].adjecent[i] = NULL;       
+        path_finding_data.nodes[x + y * map->width] = (NavNode) {
+            .skip = id ? false : true,
+            .occupier = NULL,
+            .position = (Coordinates) { x, y },
+        };
+
+        // TODO: memset ??
+        for (int i = 0; i < NAV_NODE_MAX_SIBS; i++)  {
+            path_finding_data.nodes[x + y * map->width].adjecent[i] = NULL;     
         }
-    }
+    }));
 
     // add adjacent
-    for (int y = 0; y < map->height; y++) {
-        for (int x = 0; x < map->width; x++) {
-            NavNode* node = &path_finding_data.nodes[x + y * map->width];
+    Map_ForEachTile(map, {
+        NavNode* node = &path_finding_data.nodes[x + y * map->width];
 
-            WallTile n_tile = Map_GetMidground(map, x, y);
-            
-            // TODO: memset ??
-            for (int i = 0; i < NAV_NODE_MAX_SIBS; i++) {
-                // Temp: how will we handle doors ?
-                if (n_tile.ids[i]) continue;
+        WallTile n_tile = Map_GetMidground(map, x, y);
+        
+        // TODO: memset ??
+        for (int i = 0; i < NAV_NODE_MAX_SIBS; i++) {
+            // Temp: how will we handle doors ?
+            if (n_tile.ids[i]) continue;
 
-                int a_x = x + DIR_X[i];
-                int a_y = y + DIR_Y[i];
+            int a_x = x + DIR_X[i];
+            int a_y = y + DIR_Y[i];
 
-                if (a_x < 0 || a_y < 0 || a_x >= map->width || a_y >= map->height)
-                    continue;
+            if (a_x < 0 || a_y < 0 || a_x >= map->width || a_y >= map->height)
+                continue;
 
-                NavNode* adj_node = &path_finding_data.nodes[a_x  + a_y * map->width];
+            NavNode* adj_node = &path_finding_data.nodes[a_x  + a_y * map->width];
 
-                if (!adj_node->skip) {
+            if (!adj_node->skip) {
 
-                    WallTile a_tile = Map_GetMidground(map, a_x, a_y);
+                WallTile a_tile = Map_GetMidground(map, a_x, a_y);
 
-                    if (a_tile.ids[OPPOSITE[i]]) continue;
+                if (a_tile.ids[OPPOSITE[i]]) continue;
 
-                    path_finding_data.nodes[x + y * map->width].adjecent[i] = adj_node; 
-                }
-
+                path_finding_data.nodes[x + y * map->width].adjecent[i] = adj_node; 
             }
+
         }
-    }
+    });
+
 }
 
 bool PathFinding_ClaimIndex(Entity* entity, Coordinates coords) { 

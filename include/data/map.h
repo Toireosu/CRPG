@@ -12,6 +12,13 @@ typedef struct Map {
     char* foreground;
 } Map;
 
+#define Map_ForEachTile(map, exp) \
+    do {\
+        for (int x = 0; x < map->width; x++)\
+            for (int y = 0; y < map->width; y++)\
+                exp ;\
+    } while(0)\
+
 // Map must be freed with Map_Free after creation.
 void Map_Create(Map* map, int width, int height);
 void Map_Free(Map* map);
