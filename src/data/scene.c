@@ -8,3 +8,7 @@ void Scene_Init(Scene* scene) {
 Entity* Scene_CreateEntity(Scene* scene) {
     return &scene->entities[scene->entities_count++];
 }
+
+void Scene_SetPlayer(Scene* scene, Entity* entity) {
+    scene->player = entity;
+}

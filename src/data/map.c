@@ -51,3 +51,17 @@ void Map_SetMidground(Map* map, int x, int y, int index, char id) {
 
     map->midground[x + y * map->width].ids[index] = id;
 }
+
+char Map_GetForeground(const Map* map, int x, int y) {
+    if (Map_OutOfBounds(map, x, y))
+        return 0;
+
+    return map->foreground[x + y * map->width];
+}
+
+void Map_SetForeground(Map* map, int x, int y, char id) {
+    if (Map_OutOfBounds(map, x, y))
+        return;
+
+    map->foreground[x + y * map->width] = id;
+}

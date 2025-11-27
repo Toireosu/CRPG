@@ -22,4 +22,7 @@ void Map_SetBackground(Map* map, int x, int y, char id);
 WallTile Map_GetMidground(const Map* map, int x, int y);
 void Map_SetMidground(Map* map, int x, int y, int index, char id);
 
+char Map_GetForeground(const Map* map, int x, int y);
+void Map_SetForeground(Map* map, int x, int y, char id);
+
 #endif

@@ -9,6 +9,8 @@
         "render_map.h": "c",
         "array": "c",
         "string_view": "c",
-        "renderer.h": "c"
+        "renderer.h": "c",
+        "map": "c",
+        "format": "c"
     }
 }

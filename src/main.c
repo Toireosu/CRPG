@@ -25,7 +25,19 @@ void MakeHouse(Game* game, Coordinates v) {
     Map_SetMidground(&game->scene->map, 2 + v.x, 0 + v.y, 1, 2); 
 
     Map_SetMidground(&game->scene->map, 2 + v.x, 0 + v.y, 2, 3);
-    Map_SetMidground(&game->scene->map, 0 + v.x, 0 + v.y, 2, 3);    
+    Map_SetMidground(&game->scene->map, 0 + v.x, 0 + v.y, 2, 3);   
+    
+    Map_SetForeground(&game->scene->map, v.x, v.y, 1);
+    Map_SetForeground(&game->scene->map, v.x + 1, v.y, 1);
+    Map_SetForeground(&game->scene->map, v.x + 2, v.y, 1);
+    
+    Map_SetForeground(&game->scene->map, v.x, v.y + 1, 1);
+    Map_SetForeground(&game->scene->map, v.x + 1, v.y + 1, 1);
+    Map_SetForeground(&game->scene->map, v.x + 2, v.y + 1, 1);
+    
+    Map_SetForeground(&game->scene->map, v.x, v.y + 2, 1);
+    Map_SetForeground(&game->scene->map, v.x + 1, v.y + 2, 1);
+    Map_SetForeground(&game->scene->map, v.x + 2, v.y + 2, 1);
 }
 
 int main(int argc, char** argv) {
@@ -65,8 +77,10 @@ int main(int argc, char** argv) {
     CharacterController_SetCharacter(&game->scene->entities[0]);
 
     Entity* entity1 = Scene_CreateEntity(game->scene);
-    Entity_Init(entity1, ET_CHARACTER, (Coordinates){ 1, 5 });
+    Entity_Init(entity1, ET_CHARACTER, (Coordinates){ 1, 7 });
 
+    Scene_SetPlayer(game->scene, entity0);
+    Renderer_MapInit(&game->scene->map);
 
     while (!WindowHandler_WindowShouldClose()) {
         GameRunner_Run(game);

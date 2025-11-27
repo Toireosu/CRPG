@@ -6,6 +6,7 @@
 extern Texture floor_texture;
 extern Texture wall_texture;
 extern Texture character_texture;
+extern Texture roof_texture;
 
 typedef struct Sprite {
     Texture texture;
@@ -25,6 +26,8 @@ void Renderer_RenderUI(Game* game);
 // render_map.c
 void Renderer_CollectMapSprites(const Map* map);
 void Renderer_RenderMapBackground(const Map* map);
+void Renderer_RenderMapForeground(const Scene* scene);
+void Renderer_MapInit(const Map* map);
 // render_entity.c
 void Renderer_CollectEntitySprites(const Scene* scene);
 

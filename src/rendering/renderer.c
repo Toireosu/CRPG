@@ -6,6 +6,7 @@
 Texture floor_texture;
 Texture wall_texture;
 Texture character_texture;
+Texture roof_texture;
 
 static kvec_t(Sprite) sprites;
 
@@ -46,6 +47,8 @@ static void Renderer_RenderScene(Scene* scene) {
     qsort(sprites.a, kv_size(sprites), sizeof(Sprite), Renderer_CompareSprite);
 
     Renderer_RenderMidground();
+
+    Renderer_RenderMapForeground(scene);
 }
 
 void Renderer_Init() {
@@ -60,6 +63,10 @@ void Renderer_Init() {
     Image character_image = LoadImageFromMemory(".png", precomped_texture_character, sizeof(precomped_texture_character));
     character_texture = LoadTextureFromImage(character_image);
     UnloadImage(character_image);
+
+    Image roof_image = LoadImageFromMemory(".png", precomped_texture_roofs, sizeof(precomped_texture_roofs));
+    roof_texture = LoadTextureFromImage(roof_image);
+    UnloadImage(roof_image);
 
     kv_init(sprites);
     // Empty
