@@ -14,6 +14,7 @@ typedef enum EntityType {
 typedef struct NavPath NavPath;
 typedef struct Entity {
     Vector2 position;
+    Coordinates occupied_coord;
     NavPath* path;
     int path_index;
     Vector2 size;

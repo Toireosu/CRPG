@@ -7,8 +7,17 @@
 
 #define ENTITY_MOVE_SPEED 2
 
+static bool Entity_OccupyTile(Entity* entity, Coordinates coords) {
+    bool result = PathFinding_ClaimIndex(entity, coords);
+    entity->position = Coordinates_ToVector2(entity->occupied_coord);
+    return result;
+}
+
 void Entity_Init(Entity* entity, EntityType type, Coordinates position) {
     entity->position = Coordinates_ToVector2(position);
+    // Needed for OccupyTile logic
+    entity->occupied_coord = (Coordinates){-1, -1};
+    Entity_OccupyTile(entity, position);
     entity->path = malloc(sizeof(NavPath)); 
     *entity->path = (NavPath) { .success = false, .data.reason = "", };
     entity->size = (Vector2){ 16, 16 };
@@ -20,6 +29,7 @@ void Entity_Init(Entity* entity, EntityType type, Coordinates position) {
     }
 }
 
+
 void Entity_Free(Entity* entity) {
     free(entity->path);
 }
@@ -27,8 +37,8 @@ void Entity_Free(Entity* entity) {
 void Entity_Tick(Entity* entity, float delta) {
     if (!entity->path->success) return;
 
-    
-    Vector2 target_index = Coordinates_ToVector2(kv_A(entity->path->data.path, entity->path_index));
+    Coordinates target_coordinates = kv_A(entity->path->data.path, entity->path_index);
+    Vector2 target_index = Coordinates_ToVector2(target_coordinates);
     Vector2 dir = Vector2Subtract(target_index, entity->position);
     Vector2 step =  Vector2Scale(Vector2Normalize(Vector2Subtract(target_index, entity->position)), delta * ENTITY_MOVE_SPEED);
     
@@ -40,7 +50,11 @@ void Entity_Tick(Entity* entity, float delta) {
     
     if (Vector2Length(dir) < 0.01) {
         entity->path_index--;
-        printf("Target: %f, %f \n", target_index.x, target_index.y);
+
+        if (!Entity_OccupyTile(entity, Coordinates_FromVector2(target_coordinates))) {
+            entity->path_index = -1;
+        }
+        entity->position = Coordinates_ToVector2(entity->occupied_coord);
     }
     
     if (entity->path_index < 0) {

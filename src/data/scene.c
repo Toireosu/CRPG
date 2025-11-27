@@ -5,7 +5,6 @@ void Scene_Init(Scene* scene) {
     Map_Create(&scene->map, 10, 10);
 }
 
-void Scene_Add(Scene* scene, Entity entity) {
-    scene->entities[scene->entities_count] = entity;
-    scene->entities_count += 1;
+Entity* Scene_CreateEntity(Scene* scene) {
+    return &scene->entities[scene->entities_count++];
 }

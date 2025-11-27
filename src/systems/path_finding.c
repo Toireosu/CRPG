@@ -12,6 +12,7 @@
 
 typedef struct NavNode {
     bool skip;
+    Entity* occupier;
     Coordinates position;
     struct NavNode* adjecent[NAV_NODE_MAX_SIBS];
 } NavNode;
@@ -46,6 +47,7 @@ void PathFinding_Build(Scene* scene) {
     
             path_finding_data.nodes[x + y * map->width] = (NavNode) {
                 .skip = id ? false : true,
+                .occupier = NULL,
                 .position = (Coordinates) { x, y },
             };
 
@@ -89,7 +91,18 @@ void PathFinding_Build(Scene* scene) {
     }
 }
 
-bool PathFinding_ClaimIndex(Entity* entity, Coordinates position) { /* TODO */ }
+bool PathFinding_ClaimIndex(Entity* entity, Coordinates coords) { 
+    if (PathFinding_PositionIsOutside(coords)) return false;
+    NavNode* node = &path_finding_data.nodes[coords.x + coords.y * path_finding_data.width];
+    if (node->occupier && node->occupier != entity) return false;
+
+    if (PathFinding_PositionIsOutside(entity->occupied_coord)) {
+        path_finding_data.nodes[entity->occupied_coord.x + entity->occupied_coord.y * path_finding_data.width].occupier = NULL;
+    }
+    node->occupier = entity;
+    entity->occupied_coord = coords;
+    return true;
+}
 
 typedef struct NavBuildNode {
     int g; // distance from start 
@@ -197,6 +210,9 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
             NavNode* sib_node = current_m.adjecent[i];
 
             if (!sib_node) continue;
+
+            // If tile is occupied skip
+            if (sib_node->occupier) continue;
 
             NavBuildNode* sbn = NavBuildNode_New(*sib_node, current, to);
 

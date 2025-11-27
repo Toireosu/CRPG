@@ -13,6 +13,6 @@ typedef struct Scene {
 } Scene;
 
 void Scene_Init(Scene* scene);
-void Scene_Add(Scene* scene, Entity entity);
+Entity* Scene_CreateEntity(Scene* scene);
 
 #endif 
