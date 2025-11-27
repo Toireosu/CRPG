@@ -5,7 +5,8 @@
 #include "raymath.h"
 #include "systems/event_log.h"
 
-#define ENTITY_MOVE_SPEED 2
+#define ENTITY_MOVE_MAX_VEL 2
+#define ENTITY_SMOOTHING_FACTOR 21
 
 static bool Entity_OccupyTile(Entity* entity, Coordinates coords) {
     bool result = PathFinding_ClaimIndex(entity, coords);
@@ -15,6 +16,7 @@ static bool Entity_OccupyTile(Entity* entity, Coordinates coords) {
 
 void Entity_Init(Entity* entity, EntityType type, Coordinates position) {
     entity->position = Coordinates_ToVector2(position);
+    entity->velocity = (Vector2){ 0 };
     // Needed for OccupyTile logic
     entity->occupied_coord = (Coordinates){-1, -1};
     Entity_OccupyTile(entity, position);
@@ -40,13 +42,12 @@ void Entity_Tick(Entity* entity, float delta) {
     Coordinates target_coordinates = kv_A(entity->path->data.path, entity->path_index);
     Vector2 target_index = Coordinates_ToVector2(target_coordinates);
     Vector2 dir = Vector2Subtract(target_index, entity->position);
-    Vector2 step =  Vector2Scale(Vector2Normalize(Vector2Subtract(target_index, entity->position)), delta * ENTITY_MOVE_SPEED);
-    
-    // Temp
-    entity->position = Vector2Add(
-        entity->position, 
-        step
-    );
+
+    Vector2 desired_vel = Vector2Scale(Vector2Normalize(dir), ENTITY_MOVE_MAX_VEL);
+
+    entity->velocity = Vector2Lerp(entity->velocity, desired_vel, ENTITY_SMOOTHING_FACTOR * delta);
+
+    entity->position = Vector2Add(entity->position, Vector2Scale(entity->velocity, delta));
     
     if (Vector2Length(dir) < 0.01) {
         entity->path_index--;
@@ -65,7 +66,6 @@ void Entity_Tick(Entity* entity, float delta) {
 }
 
 void Entity_Move(Entity* entity, Coordinates coords) {
-    // TODO: Print message if player 
     *entity->path = PathFinding_FindPath(Coordinates_FromVector2(entity->position), coords);
     
     if (entity->path->success) {
