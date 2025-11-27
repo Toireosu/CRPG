@@ -7,7 +7,7 @@
 #include "kvec.h"
 #include "data/coordinates.h"
 
-void Navigation_Init(Scene* scene);
+void Navigation_Init(const Map* map);
 bool Navigation_OccupyTile(Entity* entity, Coordinates position);
 NavPath Navigation_FindPath(Coordinates from, Coordinates to);
 

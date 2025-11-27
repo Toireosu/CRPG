@@ -31,9 +31,12 @@ static inline int NavSearchNode_Compare(const void* pa, const void* pb);
 static inline int NavSearchNode_Equal(NavSearchNode* a, NavSearchNode* b);
 static NavSearchNode* NavSearchNode_Create(NavGraphNode n, NavSearchNode* parent, Coordinates target_position);
 
-static kvec_t(NavSearchNode) node_heap;
+typedef kvec_t(NavSearchNode) NavSearchNodeList;
+typedef kvec_t(NavSearchNode*) NavOpenNodeList;
 
-KHASH_INIT(NavSearchNodeSet, NavSearchNode*, char, false, NavNode_Hash, NavNode_Equal)
+static NavSearchNodeList node_heap;
+
+KHASH_INIT(NavSearchNodeSet, NavSearchNode*, char, false, NavSearchNode_Hash, NavSearchNode_Equal)
 
 struct {
     int width;
@@ -50,9 +53,9 @@ static NavGraphNode* Navigation_GetGraphNodeRef(Coordinates coords) {
 }
 
 
-static const int DIR_X[4] = { -1, +1,  0,  0 };
-static const int DIR_Y[4] = {  0,  0, -1, +1 };
-static const int OPPOSITE[4] = { 1, 0, 3, 2 };
+static const int WALL_DIR_X[4] = { -1, +1,  0,  0 };
+static const int WALL_DIR_Y[4] = {  0,  0, -1, +1 };
+static const int WALL_OPPOSITE_INDEX[4] = { 1, 0, 3, 2 };
 
 static void PathFinding_AddNode(const Map* map, int x, int y) {
     char id = Map_GetBackground(map, x, y);
@@ -80,8 +83,8 @@ static void PathFinding_AddEdges(const Map* map, int x, int y) {
         if (tile.ids[i]) continue;
 
         Coordinates adjacent_coords = (Coordinates) {
-            .x = x + DIR_X[i],
-            .y = y + DIR_Y[i],
+            .x = x + WALL_DIR_X[i],
+            .y = y + WALL_DIR_Y[i],
         };
 
         if (Navigation_CoordinatesOutside(adjacent_coords)) continue;
@@ -91,14 +94,14 @@ static void PathFinding_AddEdges(const Map* map, int x, int y) {
         if (adjacent_node->exists) {
             WallTile adjacent_tile = Map_GetMidground(map, adjacent_coords.x, adjacent_coords.y);
 
-            if (adjacent_tile.ids[OPPOSITE[i]]) continue;
+            if (adjacent_tile.ids[WALL_OPPOSITE_INDEX[i]]) continue;
 
             node->adjecent[i] = adjacent_node; 
         }
     }
 }
 
-void PathFinding_Build(const Map* map) {
+void Navigation_Init(const Map* map) {
     int area = map->width * map->height;
 
     navigation_graph.width = map->width;
@@ -113,7 +116,7 @@ void PathFinding_Build(const Map* map) {
     Map_ForEachTile(map, PathFinding_AddEdges(map, x, y));
 }
 
-bool PathFinding_ClaimIndex(Entity* entity, Coordinates coords) { 
+bool Navigation_OccupyTile(Entity* entity, Coordinates coords) { 
     if (Navigation_CoordinatesOutside(coords)) return false;
 
     NavGraphNode* node = Navigation_GetGraphNodeRef(coords);
@@ -163,8 +166,8 @@ static inline int NavSearchNode_Equal(NavSearchNode* a, NavSearchNode* b) {
            a->coords.y == b->coords.y;
 } 
 
-static inline Navigation_Free( kvec_t(NavSearchNode*)* open, khash_t(NavSearchNodeSet)** closed) {
-    kh_destroy(NavNodeSet, *closed);
+static inline void Navigation_Free(NavOpenNodeList* open, khash_t(NavSearchNodeSet)** closed) {
+    kh_destroy(NavSearchNodeSet, *closed);
     kv_destroy(*open);
 }
 
@@ -195,11 +198,11 @@ NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
     if (!to_node.exists) return (NavPath){ .success = false, .data.reason = "Can't get there!" };
 
     
-    khash_t(NavSearchNodeSet) *closed = kh_init(NavNodeSet);
-    kvec_t(NavSearchNode*) open;
+    khash_t(NavSearchNodeSet) *closed = kh_init(NavSearchNodeSet);
+    NavOpenNodeList open;
     kv_init(open);
     
-    NavSearchNode* first = NavBuildNode_Alloc(from_node, NULL, to);
+    NavSearchNode* first = NavSearchNode_Create(from_node, NULL, to);
     kv_push(NavSearchNode*, open, first);
 
     while (kv_size(open) > 0) {
@@ -210,7 +213,7 @@ NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
         open.a[0] = open.a[kv_size(open) - 1];
         kv_pop(open);
         int r;
-        kh_put(NavNodeSet, closed, open_search_node, &r);
+        kh_put(NavSearchNodeSet, closed, open_search_node, &r);
         
         if (Coordinates_Equals(open_search_node->coords, to_node.coords)) {
             
@@ -229,9 +232,9 @@ NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
             // If tile is occupied skip
             if (sib_node->occupier) continue;
 
-            NavSearchNode* adjacent_node = NavBuildNode_Create(*sib_node, open_search_node, to);
+            NavSearchNode* adjacent_node = NavSearchNode_Create(*sib_node, open_search_node, to);
 
-            khiter_t it = kh_get(NavNodeSet, closed, adjacent_node);
+            khiter_t it = kh_get(NavSearchNodeSet, closed, adjacent_node);
             if (it != kh_end(closed))
                 continue;
             

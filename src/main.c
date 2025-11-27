@@ -7,7 +7,7 @@
 #include "systems/character_controller.h"
 #include <stdlib.h>
 #include "rendering/renderer.h"
-#include "systems/path_finding.h"
+#include "systems/navigation.h"
 #include "systems/world_camera.h"
 
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 
     MakeHouse(game, (Coordinates){6, 4});
 
-    PathFinding_Build(game->scene);
+    Navigation_Init(&game->scene->map);
     WorldCamera_Init();
     WorldCamera_SetPosition((Vector2){0, -130});
 

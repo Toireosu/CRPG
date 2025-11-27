@@ -1,5 +1,5 @@
 #include "data/entity.h"
-#include "systems/path_finding.h"
+#include "systems/navigation.h"
 #include <stdio.h>
 
 #include "raymath.h"
@@ -13,7 +13,7 @@ static void Entity_SnapPosition(Entity* entity) {
 }
 
 static bool Entity_OccupyTile(Entity* entity, Coordinates coords) {
-    bool result = PathFinding_ClaimIndex(entity, coords);
+    bool result = Navigation_OccupyTile(entity, coords);
     Entity_SnapPosition(entity);
     return result;
 }
@@ -28,7 +28,7 @@ static void Entity_NavPathReset(Entity* entity) {
 
 void Entity_Init(Entity* entity, EntityType type, Coordinates position) {
     // Maybe not needed?
-    // entity->position = Coordinates_ToVector2(position);
+    entity->position = Coordinates_ToVector2(position);
     entity->velocity = (Vector2){ 0 };
 
     entity->occupied_coord = (Coordinates){-1, -1};
@@ -80,7 +80,7 @@ void Entity_Tick(Entity* entity, float delta) {
 
 void Entity_BeginMove(Entity* entity, Coordinates coords) {
     Entity_NavPathReset(entity);
-    entity->path = PathFinding_FindPath(Coordinates_FromVector2(entity->position), coords);
+    entity->path = Navigation_FindPath(Coordinates_FromVector2(entity->position), coords);
     
     if (entity->path.success) {
         entity->path_index = kv_size(entity->path.data.path) - 1;
