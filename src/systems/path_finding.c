@@ -116,14 +116,17 @@ static int Navigation_Hueristic(Coordinates c0, Coordinates c1) {
     return roundl((abs(c1.x - c0.x) + abs(c1.y - c1.x)) * 0.8); 
 }
 
-static NavBuildNode* NavBuildNode_New(NavNode n, NavBuildNode* parent, Coordinates target_position) {
-    NavBuildNode* nbn = malloc(sizeof(NavBuildNode));
-    nbn->g = parent ? parent->g + 1 : 0;
-    nbn->h = Navigation_Hueristic(n.position, target_position);
-    nbn->f = nbn->g + nbn->h;
-    nbn->parent = parent;
-    nbn->position = n.position;
-    return nbn;
+static kvec_t(NavBuildNode) node_heap;
+static NavBuildNode* NavBuildNode_Alloc(NavNode n, NavBuildNode* parent, Coordinates target_position) {
+    NavBuildNode nbn;
+    nbn.g = parent ? parent->g + 1 : 0;
+    nbn.h = Navigation_Hueristic(n.position, target_position);
+    nbn.f = nbn.g + nbn.h;
+    nbn.parent = parent;
+    nbn.position = n.position;
+    kv_push(NavBuildNode, node_heap, nbn);
+
+    return &kv_A(node_heap, kv_size(node_heap) - 1);
 }
 
 static inline khint_t NavNode_Hash(NavBuildNode* n) {
@@ -145,9 +148,12 @@ static inline int NavNode_Equal(NavBuildNode* a, NavBuildNode* b) {
 
 KHASH_INIT(NavNodeSet, NavBuildNode*, char, false, NavNode_Hash, NavNode_Equal)
 
+
 NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
     if (PathFinding_PositionIsOutside(from)) return (NavPath){ .success = false, .data.reason = "Error: Entity outside of bounds!" };
     if (PathFinding_PositionIsOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };;
+
+    kv_size(node_heap) = 0;
 
     NavNode from_node = path_finding_data.nodes[(int)from.x + (int)from.y * path_finding_data.width]; 
     NavNode to_node = path_finding_data.nodes[(int)to.x + (int)to.y * path_finding_data.width]; 
@@ -160,11 +166,8 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
     kvec_t(NavBuildNode*) open;
     kv_init(open);
     
-    
-    kv_push(NavBuildNode*, open, NavBuildNode_New(from_node, NULL, to));
-    printf("From: %f, %f\n", from_node.position.x, from_node.position.y);
-    printf("To: %f, %f\n", to_node.position.x, to_node.position.y);
-    // Maybe we could allocat memory on stack for all potential node? And then migrate them to heap later?
+    NavBuildNode* first = NavBuildNode_Alloc(from_node, NULL, to);
+    kv_push(NavBuildNode*, open, first);
 
     while (kv_size(open) > 0) {
         qsort(open.a, kv_size(open), sizeof(NavBuildNode*), NavNode_Compare);
@@ -195,12 +198,7 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
                 current = current->parent;
             }
             
-            for (int i = 0; i < kv_size(open); i++) free(open.a[i]);
             kv_destroy(open);
-            
-            NavBuildNode* k;
-            char v;
-            // kh_foreach(closed, k, v, free(k));
             kh_destroy(NavNodeSet, closed);
             
             return path;
@@ -214,11 +212,10 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
             // If tile is occupied skip
             if (sib_node->occupier) continue;
 
-            NavBuildNode* sbn = NavBuildNode_New(*sib_node, current, to);
+            NavBuildNode* sbn = NavBuildNode_Alloc(*sib_node, current, to);
 
             khiter_t it = kh_get(NavNodeSet, closed, sbn);
             if (it != kh_end(closed)) {
-                free(sbn);
                 continue;
             }
             
@@ -226,11 +223,6 @@ NavPath PathFinding_FindPath(Coordinates from, Coordinates to) {
         }
 
     }
-
-    for (int i = 0; i < kv_size(open); i++) free(open.a[i]);
-    NavBuildNode* k;
-    char v;
-    // kh_foreach(closed, k, v, { free(k); });
 
     kv_destroy(open);
     kh_destroy(NavNodeSet, closed);
