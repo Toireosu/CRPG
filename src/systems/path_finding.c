@@ -96,7 +96,7 @@ bool PathFinding_ClaimIndex(Entity* entity, Coordinates coords) {
     NavNode* node = &path_finding_data.nodes[coords.x + coords.y * path_finding_data.width];
     if (node->occupier && node->occupier != entity) return false;
 
-    if (PathFinding_PositionIsOutside(entity->occupied_coord)) {
+    if (!PathFinding_PositionIsOutside(entity->occupied_coord)) {
         path_finding_data.nodes[entity->occupied_coord.x + entity->occupied_coord.y * path_finding_data.width].occupier = NULL;
     }
     node->occupier = entity;
