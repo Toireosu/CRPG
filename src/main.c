@@ -6,7 +6,7 @@
 #include "systems/window_handler.h"
 #include "systems/character_controller.h"
 #include <stdlib.h>
-#include "systems/renderer.h"
+#include "rendering/renderer.h"
 #include "systems/path_finding.h"
 #include "systems/world_camera.h"
 

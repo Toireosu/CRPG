@@ -1,6 +1,6 @@
 #include "systems/game_runner.h"
 
-#include "systems/renderer.h"
+#include "rendering/renderer.h"
 #include "systems/mouse_manager.h"
 #include "systems/entity_controller.h"
 
@@ -11,5 +11,5 @@ void GameRunner_Run(Game* game) {
 
     EntityController_Tick(game->scene, delta);
 
-    Renderer_RenderGame(game);
+    Renderer_Render(game);
 }

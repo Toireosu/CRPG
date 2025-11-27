@@ -5,6 +5,10 @@
         "*.m": "c",
         "chrono": "c",
         "ranges": "c",
-        "variant": "c"
+        "variant": "c",
+        "render_map.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "renderer.h": "c"
     }
 }
