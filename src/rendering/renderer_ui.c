@@ -1,6 +1,6 @@
 #include "rendering/renderer.h"
 
-#include "data/event_log.h"
+#include "systems/event_log.h"
 #include "systems/window_handler.h"
 #include "raylib.h"
 
