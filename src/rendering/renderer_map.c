@@ -1,6 +1,6 @@
 #include "rendering/renderer.h"
 
-#include "systems/world_camera.h"
+#include "systems/scene_camera.h"
 #include <string.h>
 
 static const float WALL_X[4] = { -0.5, 0.5, 0, 0 };
@@ -49,7 +49,7 @@ void Renderer_MapInit(const Map* map) {
 }
 
 static Vector2 Renderer_CalculateWallSegPosition(int x, int y, int i) {
-    return WorldCamera_MapToScreen((Vector2){ x + WALL_X[i], y + WALL_Y[i] });
+    return SceneCamera_MapToScreen((Vector2){ x + WALL_X[i], y + WALL_Y[i] });
 }
 
 void Renderer_RenderMapForeground(const Scene* scene) {
@@ -65,12 +65,12 @@ void Renderer_RenderMapForeground(const Scene* scene) {
         if (Map_GetForeground(map, x, y)) {
             if (roof_mask[x + y * map->width] == player_roof_index) continue;
 
-            Vector2 w_pos = WorldCamera_MapToScreen((Vector2){ x, y });
+            Vector2 position = SceneCamera_MapToScreen((Vector2){ x, y });
 
             DrawTexturePro(
                 roof_texture, 
                 (Rectangle){0, 0, 64, 32},
-                (Rectangle){ w_pos.x, w_pos.y - 48, 64, 32 }, 
+                (Rectangle){ position.x, position.y - 48, 64, 32 }, 
                 (Vector2){ 32, 16 }, 
                 0.0f,
                 WHITE
@@ -82,12 +82,12 @@ void Renderer_RenderMapForeground(const Scene* scene) {
 void Renderer_RenderMapBackground(const Map* map) {
     Map_ForEachTile(map, {
         if (Map_GetBackground(map, x, y)) {
-            Vector2 w_pos = WorldCamera_MapToScreen((Vector2){ x, y });
+            Vector2 position = SceneCamera_MapToScreen((Vector2){ x, y });
 
             DrawTexturePro(
                 floor_texture, 
                 (Rectangle){0, 0, 64, 32},
-                (Rectangle){ w_pos.x, w_pos.y, 64, 32 }, 
+                (Rectangle){ position.x, position.y, 64, 32 }, 
                 (Vector2){ 32, 16 }, 
                 0.0f,
                 WHITE
@@ -103,7 +103,7 @@ void Renderer_CollectMapSprites(const Map* map) {
         for (int i = 0; i < WALL_TILE_NUM_WALLS; i++) {
             if (!tile.ids[i]) continue;                
 
-            Vector2 w_pos = Renderer_CalculateWallSegPosition(x, y, i);
+            Vector2 position = Renderer_CalculateWallSegPosition(x, y, i);
 
             Renderer_AddSprite((Sprite){
                 .texture = wall_texture,
@@ -113,7 +113,7 @@ void Renderer_CollectMapSprites(const Map* map) {
                     32,
                     64
                 },
-                .position = w_pos,
+                .position = position,
                 .size = (Vector2){ 32, 64 },
                 .origin = (Vector2){ 16, 56 },
                 .z = Renderer_CalculateZ((Vector2){ x, y }) + WALL_Z[i],

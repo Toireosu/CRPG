@@ -3,10 +3,11 @@
 #include <stddef.h>
 
 #include "systems/character_controller.h"
-#include "systems/world_camera.h"
-#include "systems/window_handler.h"
+#include "systems/scene_camera.h"
+#include "systems/window_manager.h"
 
-#include "data/globs.h"
+#include "data/globals.h"
+#include "systems/message_log.h"
 
 #include "raymath.h"
 
@@ -32,10 +33,10 @@ static bool MouseManager_HandleEntities(Game* game) {
         const Entity* entity =  &scene->entities[i];
         Rectangle rect = (Rectangle) { entity->position.x - 0.25, entity->position.y - 2, 0.5, 2 };
 
-        if (CheckCollisionPointRec(WorldCamera_ScreenToMap(GetMousePosition()), rect)) {
+        if (CheckCollisionPointRec(SceneCamera_ScreenToMap(GetMousePosition()), rect)) {
 
             if (MouseManager.last_hovered != entity)
-                EventLog_Push("You see: An entity.");
+                MessageLog_Push("You see: An entity.");
             return MouseManager_Hover((void*)entity);
         }
     }
@@ -50,10 +51,10 @@ static bool MouseManager_ScrollScreen(Game* game) {
     float delta = GetFrameTime();
 
     Vector2 mouse_position = GetMousePosition();
-    if (mouse_position.x < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED), delta);
-    if (mouse_position.y < SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED), delta);
-    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
-    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) WorldCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
+    if (mouse_position.x < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED), delta);
+    if (mouse_position.y < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED), delta);
+    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
+    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
 }
 
 void MouseManager_TakeInput(Game* game) {

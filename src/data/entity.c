@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "raymath.h"
-#include "systems/event_log.h"
+#include "systems/message_log.h"
 
 #define ENTITY_MOVE_MAX_VEL 2
 #define ENTITY_SMOOTHING_FACTOR 21
@@ -85,6 +85,6 @@ void Entity_BeginMove(Entity* entity, Coordinates coords) {
     if (entity->path.success) {
         entity->path_index = kv_size(entity->path.data.path) - 1;
     } else {
-        EventLog_Push(entity->path.data.reason);
+        MessageLog_Push(entity->path.data.reason);
     }
 }

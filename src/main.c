@@ -2,13 +2,14 @@
 
 #include "data/game.h"
 #include "data/scene.h"
-#include "systems/game_runner.h"
-#include "systems/window_handler.h"
+#include "systems/engine.h"
+#include "systems/window_manager.h"
 #include "systems/character_controller.h"
 #include <stdlib.h>
 #include "rendering/renderer.h"
 #include "systems/navigation.h"
-#include "systems/world_camera.h"
+#include "systems/scene_camera.h"
+#include "systems/message_log.h"
 
 
 void MakeHouse(Game* game, Coordinates v) {
@@ -41,13 +42,13 @@ void MakeHouse(Game* game, Coordinates v) {
 }
 
 int main(int argc, char** argv) {
-    WindowHandler_Init();
+    WindowManager_Init();
 
     Game* game = (Game*)malloc(sizeof(Game));
 
     Game_Init(game);
     Renderer_Init();
-    EventLog_Init();
+    MessageLog_Init();
 
 
     game->scene = (Scene*)malloc(sizeof(Scene));
@@ -66,8 +67,8 @@ int main(int argc, char** argv) {
     MakeHouse(game, (Coordinates){6, 4});
 
     Navigation_Init(&game->scene->map);
-    WorldCamera_Init();
-    WorldCamera_SetPosition((Vector2){0, -130});
+    SceneCamera_Init();
+    SceneCamera_SetPosition((Vector2){0, -130});
 
     // Mock add entities
 
@@ -82,7 +83,7 @@ int main(int argc, char** argv) {
     Scene_SetPlayer(game->scene, entity0);
     Renderer_MapInit(&game->scene->map);
 
-    while (!WindowHandler_WindowShouldClose()) {
-        GameRunner_Run(game);
+    while (!WindowManager_WindowShouldClose()) {
+        Engine_Run(game);
     }
 }

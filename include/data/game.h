@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include "scene.h"
-#include "systems/event_log.h"
 
 typedef struct Game {
     Scene* scene;

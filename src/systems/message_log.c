@@ -1,0 +1,29 @@
+#include "systems/message_log.h"
+
+#include <stdlib.h>
+
+struct {
+    char* data[MESSAGE_LOG_MAX_COUNT];
+} message_log;
+
+void MessageLog_Init() {
+    MessageLog_Clear();
+}
+
+void MessageLog_Clear() {
+    for (int i = 0 - 1; i < MESSAGE_LOG_MAX_COUNT; i++) {
+        message_log.data[i] = NULL;
+    }
+}
+
+void MessageLog_Push(char* entry) {
+    for (int i = MESSAGE_LOG_MAX_COUNT - 1; i > 0; i--) {
+        message_log.data[i] = message_log.data[i - 1];
+    }
+
+    message_log.data[0] = entry; 
+}
+
+char* MessageLog_Get(int index) {
+    return message_log.data[index];
+}

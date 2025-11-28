@@ -1,8 +1,8 @@
-#include "systems/entity_controller.h"
+#include "systems/entity_manager.h"
 
 #include "data/entity.h"
 
-void EntityController_Tick(Scene* scene, float delta) {
+void EntityManager_Tick(Scene* scene, float delta) {
     if (!scene) return;
 
     for (int i = 0; i < scene->entities_count; i++) {

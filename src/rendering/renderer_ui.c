@@ -1,17 +1,17 @@
 #include "rendering/renderer.h"
 
-#include "systems/event_log.h"
-#include "systems/window_handler.h"
-#include "data/globs.h"
+#include "systems/message_log.h"
+#include "systems/window_manager.h"
+#include "data/globals.h"
 #include "raylib.h"
 
 void Renderer_RenderUI(Game* game) {
     // Temp
     BeginScissorMode(0, WINDOW_HEIGHT - 150, 400, 150);
 
-    for (int i = 0; i < EVENT_LOG_MAX_COUNT; i++) {
+    for (int i = 0; i < MESSAGE_LOG_MAX_COUNT; i++) {
         DrawText(
-            EventLog_Get(i), 
+            MessageLog_Get(i), 
             0,
             WINDOW_HEIGHT - (i + 1) * 20,
             20,
