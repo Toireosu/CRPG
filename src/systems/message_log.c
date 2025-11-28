@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 struct {
-    char* data[MESSAGE_LOG_MAX_COUNT];
+    const char* data[MESSAGE_LOG_MAX_COUNT];
 } message_log;
 
 void MessageLog_Init() {
@@ -24,6 +24,6 @@ void MessageLog_Push(const char* entry) {
     message_log.data[0] = entry; 
 }
 
-char* MessageLog_Get(int index) {
+const char* MessageLog_Get(int index) {
     return message_log.data[index];
 }

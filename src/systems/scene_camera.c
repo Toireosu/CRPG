@@ -37,6 +37,6 @@ void SceneCamera_SetPosition(Vector2 v) {
     camera_data.internal.target = v;
 }
 
-void SceneCamera_Move(Vector2 v, float delta) {
-    camera_data.internal.target = Vector2Add(camera_data.internal.target, Vector2Scale(v, delta));
+void SceneCamera_Move(Vector2 v) {
+    camera_data.internal.target = Vector2Add(camera_data.internal.target, Vector2Scale(v, GetFrameTime()));
 }

@@ -54,10 +54,10 @@ static bool MouseManager_ScrollScreen() {
     float delta = GetFrameTime();
 
     Vector2 mouse_position = GetMousePosition();
-    if (mouse_position.x < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED), delta);
-    if (mouse_position.y < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED), delta);
-    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED), delta);
-    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
+    if (mouse_position.x < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED));
+    if (mouse_position.y < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED));
+    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED));
+    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED));
 }
 
 void MouseManager_TakeInput() {
