@@ -30,8 +30,30 @@ file(GLOB_RECURSE SOURCES
     src/*.c
 )
 
+
 add_executable(Falloff ${SOURCES})
 target_include_directories(Falloff PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+target_compile_options(Falloff PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    # -Werror
+)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "Enabling sanitizers for Debug build")
+
+    target_compile_options(Falloff PRIVATE
+        -fsanitize=address
+        -fsanitize=undefined
+    )
+
+    target_link_options(Falloff PRIVATE
+        -fsanitize=address
+        -fsanitize=undefined
+    )
+endif()
 
 target_link_libraries(Falloff raylib klib)
 

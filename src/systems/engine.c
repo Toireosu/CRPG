@@ -48,6 +48,7 @@ void Engine_Init() {
     WindowManager_Init();
     Renderer_Init();
     MessageLog_Init();
+    Navigation_Init();
     
     // TODO: Set gamestate
     // engine.scene = NULL;
@@ -72,7 +73,7 @@ void Engine_LoadScene(int id) {
 
     Map_SetMidground(&engine.scene.map, 7, 6, 3, 0);
 
-    Navigation_Init(&engine.scene.map);
+    Navigation_GenerateGraph(&engine.scene.map);
 
     // TODO: REMOVE Mock setup entities ------------------------
 

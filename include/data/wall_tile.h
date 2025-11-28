@@ -3,9 +3,6 @@
 
 #define WALL_TILE_NUM_WALLS 4
 
-#define WALL_TILE_EMPTY (WallTile) { 0, 0, 0, 0 }
-
-
 /** 
  * @struct WallTile
  * 
@@ -14,6 +11,8 @@
 typedef struct WallTile {
     char ids[WALL_TILE_NUM_WALLS];
 } WallTile;
+
+extern const WallTile WALL_TILE_EMPTY;
 
 /**
  * @brief Initializes all ids of a WallTile to 0 (empty).

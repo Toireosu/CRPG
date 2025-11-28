@@ -19,4 +19,6 @@ int main(int argc, char** argv) {
     while (!WindowManager_WindowShouldClose()) {
         Engine_Run();
     }
+
+    return 0;
 }

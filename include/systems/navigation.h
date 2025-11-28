@@ -7,13 +7,20 @@
 #include "kvec.h"
 #include "data/coordinates.h"
 
+
 /**
- * @brief Initializes the navigation system.
+ * @brief Intializes the navigation system.
+ */
+void Navigation_Init();
+
+
+/**
+ * @brief Generates the navigation graph for the given map.
  * 
  * @param map The map from which to generate navigation data.
  * @note This should be run everytime a new scene is loaded.
  */
-void Navigation_Init(const Map* map);
+void Navigation_GenerateGraph(const Map* map);
 
 /**
  * @brief Tries to set a tile as occupied by given entity.

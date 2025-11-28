@@ -101,7 +101,11 @@ static void PathFinding_AddEdges(const Map* map, int x, int y) {
     }
 }
 
-void Navigation_Init(const Map* map) {
+void Navigation_Init() {
+    kv_init(node_heap);
+}
+
+void Navigation_GenerateGraph(const Map* map) {
     int area = map->width * map->height;
 
     navigation_graph.width = map->width;
@@ -132,14 +136,17 @@ bool Navigation_OccupyTile(Entity* entity, Coordinates coords) {
 }
 
 static int Navigation_Hueristic(Coordinates c0, Coordinates c1) {
-    return roundl((abs(c1.x - c0.x) + abs(c1.y - c1.x)) * 0.8); 
+    return roundl((abs(c1.x - c0.x) + abs(c1.y - c0.y)) * 0.8); 
 }
 
 static NavSearchNode* NavSearchNode_Create(NavGraphNode graph_node, NavSearchNode* parent, Coordinates target_coords) {
+    int g = parent ? parent->g + 1 : 0;
+    int h = Navigation_Hueristic(graph_node.coords, target_coords);
+    
     NavSearchNode search_node = (NavSearchNode) {
-        .g = parent ? parent->g + 1 : 0,
-        .h = Navigation_Hueristic(graph_node.coords, target_coords),
-        .f = search_node.g + search_node.h,
+        .g = g,
+        .h = h,
+        .f = g + h,
         .parent = parent,
         .coords = graph_node.coords,
     };
@@ -187,7 +194,7 @@ static inline NavPath Navigation_GenerateNavPath(NavSearchNode* last_node) {
 
 NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
     if (Navigation_CoordinatesOutside(from)) return (NavPath){ .success = false, .data.reason = "Error: Entity outside of bounds!" };
-    if (Navigation_CoordinatesOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };;
+    if (Navigation_CoordinatesOutside(to)) return (NavPath){ .success = false, .data.reason = "Can't get there!" };
 
     kv_size(node_heap) = 0;
 

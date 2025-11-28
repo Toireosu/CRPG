@@ -25,8 +25,8 @@ typedef struct Map {
  */
 #define Map_ForEachTile(map, exp) \
     do {\
-        for (int x = 0; x < map->width; x++)\
-            for (int y = 0; y < map->width; y++)\
+        for (int y = 0; y < map->height; y++)\
+            for (int x = 0; x < map->width; x++)\
                 exp ;\
     } while(0)\
 

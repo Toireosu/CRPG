@@ -11,7 +11,7 @@ void MessageLog_Init() {
 }
 
 void MessageLog_Clear() {
-    for (int i = 0 - 1; i < MESSAGE_LOG_MAX_COUNT; i++) {
+    for (int i = 0; i < MESSAGE_LOG_MAX_COUNT; i++) {
         message_log.data[i] = NULL;
     }
 }

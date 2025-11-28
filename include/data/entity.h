@@ -1,7 +1,6 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "data/renderable.h"
 #include "raylib.h"
 #include "data/coordinates.h"
 #include "data/nav_path.h"
