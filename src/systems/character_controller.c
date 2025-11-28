@@ -15,7 +15,7 @@ void CharacterController_SetCharacter(Entity* entity) {
     CharacterController.entity = entity;
 }
 
-bool CharacterController_TakeInput(Game* game)  {
+bool CharacterController_TakeInput()  {
     // Temp
     Vector2 mouse_position = GetMousePosition();
     

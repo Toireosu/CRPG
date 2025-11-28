@@ -1,12 +1,14 @@
-#ifndef RENDER_SYSTEM_H
-#define RENDER_SYSTEM_H
+#ifndef RENDERER_H
+#define RENDERER_H
 
-#include "data/game.h"
+#include "data/scene.h"
+#include "raylib.h"
 
 extern Texture floor_texture;
 extern Texture wall_texture;
 extern Texture character_texture;
 extern Texture roof_texture;
+
 
 typedef struct Sprite {
     Texture texture;
@@ -19,10 +21,10 @@ typedef struct Sprite {
 
 void Renderer_Init();
 void Renderer_AddSprite(Sprite sprite);
-void Renderer_Render(Game* game);
+void Renderer_Render();
 int Renderer_CalculateZ(Vector2 coordinate);
 // render_ui.c
-void Renderer_RenderUI(Game* game);
+void Renderer_RenderUI();
 // render_map.c
 void Renderer_CollectMapSprites(const Map* map);
 void Renderer_RenderMapBackground(const Map* map);

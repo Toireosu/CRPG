@@ -2,6 +2,7 @@
 
 #include "assets/textures_precomped.h"
 #include "kvec.h"
+#include "systems/engine.h"
 
 Texture floor_texture;
 Texture wall_texture;
@@ -82,14 +83,14 @@ int Renderer_CalculateZ(Vector2 position) {
     return (coords.y - coords.x) * 2;
 }
 
-void Renderer_Render(Game* game) {
+void Renderer_Render() {
     BeginDrawing();
 
     ClearBackground(BLACK);
 
-    Renderer_RenderScene(game->scene);
+    Renderer_RenderScene(Engine_GetScene());
 
-    Renderer_RenderUI(game);
+    Renderer_RenderUI();
 
     EndDrawing();
 }

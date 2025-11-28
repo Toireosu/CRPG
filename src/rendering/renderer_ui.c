@@ -5,7 +5,7 @@
 #include "data/globals.h"
 #include "raylib.h"
 
-void Renderer_RenderUI(Game* game) {
+void Renderer_RenderUI() {
     // Temp
     BeginScissorMode(0, WINDOW_HEIGHT - 150, 400, 150);
 

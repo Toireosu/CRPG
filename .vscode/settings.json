@@ -12,6 +12,8 @@
         "renderer.h": "c",
         "map": "c",
         "format": "c",
-        "entity_controller.h": "c"
+        "entity_controller.h": "c",
+        "mouse_manager.h": "c",
+        "character_controller.h": "c"
     }
 }

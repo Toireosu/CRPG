@@ -10,6 +10,8 @@
 #include "systems/message_log.h"
 
 #include "raymath.h"
+#include "data/scene.h"
+#include "systems/engine.h"
 
 struct {
     void* last_hovered;
@@ -24,10 +26,10 @@ static bool MouseManager_Hover(void* hovered) {
     return true;
 }
 
-static bool MouseManager_HandleEntities(Game* game) {
-    if (!game->scene) return false;
+static bool MouseManager_HandleEntities() {
+    // if (!game->scene) return false;
 
-    const Scene* scene = game->scene;
+    const Scene* scene = Engine_GetScene();
 
     for (int i = 0; i < scene->entities_count; i++) {
         const Entity* entity =  &scene->entities[i];
@@ -45,8 +47,9 @@ static bool MouseManager_HandleEntities(Game* game) {
 #define SCROLL_FIELD_SIZE 50
 #define SCROLL_SPEED 40
 
-static bool MouseManager_ScrollScreen(Game* game) {
-    if (!game->scene) return false;
+static bool MouseManager_ScrollScreen() {
+    // TODO: Check if we are in scene gamestate
+    // if (!game->scene) return false;
 
     float delta = GetFrameTime();
 
@@ -57,15 +60,15 @@ static bool MouseManager_ScrollScreen(Game* game) {
     if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED), delta);
 }
 
-void MouseManager_TakeInput(Game* game) {
+void MouseManager_TakeInput() {
     // Loop over all entities to check for input
 
-    if (CharacterController_TakeInput(game))
+    if (CharacterController_TakeInput())
         return;
 
-    if (MouseManager_ScrollScreen(game))
+    if (MouseManager_ScrollScreen())
         return;
 
-    if (MouseManager_HandleEntities(game))
+    if (MouseManager_HandleEntities())
         return;
 }
