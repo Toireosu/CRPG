@@ -3,6 +3,6 @@
 
 #include "data/scene.h"
 
-void EntityManager_Tick(Scene* scene, float delta);
+void EntityManager_Tick(Scene* scene);
 
 #endif 

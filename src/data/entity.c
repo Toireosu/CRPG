@@ -73,9 +73,9 @@ void Entity_Move(Entity* entity, float delta) {
     }
 }
 
-void Entity_Tick(Entity* entity, float delta) {
+void Entity_Tick(Entity* entity) {
     if (entity->path.success)
-        Entity_Move(entity, delta);
+        Entity_Move(entity, GetFrameTime());
 }
 
 void Entity_BeginMove(Entity* entity, Coordinates coords) {

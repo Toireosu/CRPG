@@ -5,7 +5,7 @@
 
 void MessageLog_Init();
 void MessageLog_Clear();
-void MessageLog_Push(char* entry);
+void MessageLog_Push(const char* entry);
 char* MessageLog_Get(int index);
 
 #endif

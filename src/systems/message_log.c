@@ -16,7 +16,7 @@ void MessageLog_Clear() {
     }
 }
 
-void MessageLog_Push(char* entry) {
+void MessageLog_Push(const char* entry) {
     for (int i = MESSAGE_LOG_MAX_COUNT - 1; i > 0; i--) {
         message_log.data[i] = message_log.data[i - 1];
     }

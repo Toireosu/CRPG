@@ -68,6 +68,10 @@ void Engine_LoadScene(int id) {
 
     MakeHouse((Coordinates){6, 4});
 
+    MakeHouse((Coordinates){6, 7});
+
+    Map_SetMidground(&engine.scene.map, 7, 6, 3, 0);
+
     Navigation_Init(&engine.scene.map);
 
     // TODO: REMOVE Mock setup entities ------------------------
@@ -96,7 +100,7 @@ void Engine_Run() {
 
     MouseManager_TakeInput();
 
-    EntityManager_Tick(&engine.scene, delta);
+    EntityManager_Tick(&engine.scene);
 
     Renderer_Render();
 }
