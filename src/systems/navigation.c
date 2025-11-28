@@ -163,8 +163,8 @@ static inline khint_t NavSearchNode_Hash(NavSearchNode* node) {
 static inline int NavSearchNode_Compare(const void* pa, const void* pb) {
     NavSearchNode *a = *(NavSearchNode**)pa;
     NavSearchNode *b = *(NavSearchNode**)pb;
-    if (a->f < b->f) return -1;
-    if (a->f > b->f) return 1;
+    if (a->f > b->f) return -1;
+    if (a->f < b->f) return 1;
     return 0;
 } 
 
@@ -214,11 +214,11 @@ NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
 
     while (kv_size(open) > 0) {
         qsort(open.a, kv_size(open), sizeof(NavSearchNode*), NavSearchNode_Compare);
-        NavSearchNode* open_search_node = kv_A(open, 0);
+        NavSearchNode* open_search_node = kv_pop(open);
         NavGraphNode current_m = *Navigation_GetGraphNodeRef(open_search_node->coords);
         
-        open.a[0] = open.a[kv_size(open) - 1];
-        kv_pop(open);
+        // open.a[0] = open.a[kv_size(open) - 1];
+        // kv_pop(open);
         int r;
         kh_put(NavSearchNodeSet, closed, open_search_node, &r);
         

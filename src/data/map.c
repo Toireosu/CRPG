@@ -7,10 +7,10 @@ void Map_Create(Map* map, int width, int height) {
     int map_area = width * height;
     map->width = width;
     map->height = height;
-    map->farground = calloc(map_area, sizeof(char));
-    map->background = calloc(map_area, sizeof(char));
+    map->farground = calloc(map_area, sizeof(Tile));
+    map->background = calloc(map_area, sizeof(Tile));
     map->midground = calloc(map_area, sizeof(WallTile));
-    map->foreground = calloc(map_area, sizeof(char));
+    map->foreground = calloc(map_area, sizeof(Tile));
 }
 
 void Map_Free(Map* map) {
@@ -24,14 +24,14 @@ static bool Map_OutOfBounds(const Map* map, int x, int y) {
     return x < 0 || y < 0 || x >= map->width || y >= map->height;
 }
 
-char Map_GetBackground(const Map* map, int x, int y) {
+Tile Map_GetBackground(const Map* map, int x, int y) {
     if (Map_OutOfBounds(map, x, y))
         return 0;
 
     return map->background[x + y * map->width];
 }
 
-void Map_SetBackground(Map* map, int x, int y, char id) {
+void Map_SetBackground(Map* map, int x, int y, Tile id) {
     if (Map_OutOfBounds(map, x, y))
         return;
 
@@ -45,21 +45,21 @@ WallTile Map_GetMidground(const Map* map, int x, int y) {
     return map->midground[x + y * map->width];
 }
 
-void Map_SetMidground(Map* map, int x, int y, int index, char id) {
+void Map_SetMidground(Map* map, int x, int y, int index, Tile id) {
     if (Map_OutOfBounds(map, x, y))
         return;
 
     map->midground[x + y * map->width].ids[index] = id;
 }
 
-char Map_GetForeground(const Map* map, int x, int y) {
+Tile Map_GetForeground(const Map* map, int x, int y) {
     if (Map_OutOfBounds(map, x, y))
         return 0;
 
     return map->foreground[x + y * map->width];
 }
 
-void Map_SetForeground(Map* map, int x, int y, char id) {
+void Map_SetForeground(Map* map, int x, int y, Tile id) {
     if (Map_OutOfBounds(map, x, y))
         return;
 

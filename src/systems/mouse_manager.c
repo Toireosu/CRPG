@@ -42,6 +42,8 @@ static bool MouseManager_HandleEntities() {
             return MouseManager_Hover((void*)entity);
         }
     }
+
+    return false;
 } 
 
 #define SCROLL_FIELD_SIZE 50
@@ -50,14 +52,28 @@ static bool MouseManager_HandleEntities() {
 static bool MouseManager_ScrollScreen() {
     // TODO: Check if we are in scene gamestate
     // if (!game->scene) return false;
-
-    float delta = GetFrameTime();
-
+    bool ret = false;
     Vector2 mouse_position = GetMousePosition();
-    if (mouse_position.x < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED));
-    if (mouse_position.y < SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED));
-    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED));
-    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED));
+    if (mouse_position.x < SCROLL_FIELD_SIZE) {
+        SceneCamera_Move(Vector2Scale((Vector2){ -1, 0 },  SCROLL_SPEED));
+        ret = true;
+    }
+
+    if (mouse_position.y < SCROLL_FIELD_SIZE) {
+        SceneCamera_Move(Vector2Scale((Vector2){ 0, -1 },  SCROLL_SPEED));
+        ret = true;
+    }
+
+    if (mouse_position.x > WINDOW_WIDTH - SCROLL_FIELD_SIZE) {
+        SceneCamera_Move(Vector2Scale((Vector2){ 1, 0 },  SCROLL_SPEED));
+        ret = true;
+    }
+    if (mouse_position.y > WINDOW_HEIGHT - SCROLL_FIELD_SIZE) {
+        SceneCamera_Move(Vector2Scale((Vector2){ 0, 1 },  SCROLL_SPEED));
+        ret = true;
+    }
+
+    return ret;
 }
 
 void MouseManager_TakeInput() {

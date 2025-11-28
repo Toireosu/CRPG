@@ -3,6 +3,8 @@
 
 #include "wall_tile.h"
 
+typedef unsigned char Tile;
+
 /**
  * @brief Data describing the layout of a walkable map.
  * @note for all tile layers 0 means it's "air". 
@@ -10,10 +12,10 @@
 typedef struct Map {
     int width;
     int height;
-    char* farground;
-    char* background;
+    Tile* farground;
+    Tile* background;
     WallTile* midground;
-    char* foreground;
+    Tile* foreground;
 } Map;
 
 /**
@@ -55,7 +57,7 @@ void Map_Free(Map* map);
  * @param y Y-coordinate of tile.
  * @return Id of tile or zero if coordinates are out of bounds.
  */
-char Map_GetBackground(const Map* map, int x, int y);
+Tile Map_GetBackground(const Map* map, int x, int y);
 
 /**
  * @brief Sets a tile id for a given coordinate pair in the background layer.
@@ -65,7 +67,7 @@ char Map_GetBackground(const Map* map, int x, int y);
  * @param y Y-coordinate of tile.
  * @param id New tile id.
  */
-void Map_SetBackground(Map* map, int x, int y, char id);
+void Map_SetBackground(Map* map, int x, int y, Tile id);
 
 /**
  * @brief Gets wall ids for a given coordinate pair in the midground layer.
@@ -87,7 +89,7 @@ WallTile Map_GetMidground(const Map* map, int x, int y);
  * @param id New wall id.
  * @note Wall index are in order (left, right, top, bottom).
  */
-void Map_SetMidground(Map* map, int x, int y, int index, char id);
+void Map_SetMidground(Map* map, int x, int y, int index, Tile id);
 
 /**
  * @brief Gets tile id for a given coordinate pair in the foreground layer.
@@ -97,7 +99,7 @@ void Map_SetMidground(Map* map, int x, int y, int index, char id);
  * @param y Y-coordinate of tile.
  * @return Id of tile or zero if coordinates are out of bounds.
  */
-char Map_GetForeground(const Map* map, int x, int y);
+Tile Map_GetForeground(const Map* map, int x, int y);
 
 /**
  * @brief Sets a tile id for a given coordinate pair in the foreground layer.
@@ -107,6 +109,6 @@ char Map_GetForeground(const Map* map, int x, int y);
  * @param y Y-coordinate of tile.
  * @param id New tile id.
  */
-void Map_SetForeground(Map* map, int x, int y, char id);
+void Map_SetForeground(Map* map, int x, int y, Tile id);
 
 #endif
