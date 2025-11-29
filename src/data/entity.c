@@ -81,7 +81,7 @@ void Entity_Tick(Entity* entity) {
 void Entity_BeginMove(Entity* entity, Coordinates coords) {
     Entity_NavPathReset(entity);
     entity->path = Navigation_FindPath(Coordinates_FromVector2(entity->position), coords);
-    
+
     if (entity->path.success) {
         entity->path_index = kv_size(entity->path.data.path) - 1;
     } else {

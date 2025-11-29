@@ -13,8 +13,8 @@
 int main(int argc, char** argv) {
     Engine_Init();
 
-    // Mock add entities
-    Engine_LoadScene(0);
+    // // Mock add entities
+    // Engine_LoadScene(0);
 
     while (!WindowManager_WindowShouldClose()) {
         Engine_Run();

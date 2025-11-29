@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include "data/scene.h"
+#include "data/game_state.h"
 
 /**
  * @brief Initializes the engine and all subcomponents.
@@ -24,5 +25,15 @@ void Engine_Run();
  * @brief Gets current running scene.
  */
 Scene* Engine_GetScene();
+
+/**
+ * @brief Sets current game state, and runs any functions needed to switch.
+ */
+void Engine_SetGameState(GameState next_state);
+
+/**
+ * @brief Gets current game state.
+ */
+GameState Engine_GetGameState();
 
 #endif 

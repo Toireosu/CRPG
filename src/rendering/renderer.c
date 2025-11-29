@@ -88,7 +88,8 @@ void Renderer_Render() {
 
     ClearBackground(BLACK);
 
-    Renderer_RenderScene(Engine_GetScene());
+    if (Engine_GetGameState() == GS_GAME)
+        Renderer_RenderScene(Engine_GetScene());
 
     Renderer_RenderUI();
 

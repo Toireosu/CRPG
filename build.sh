@@ -19,6 +19,7 @@ export PATH="/c/msys64/ucrt64/bin:$PATH"
 
 # Generate Makefiles with hardcoded compiler
 cmake -G "MinGW Makefiles" \
+      -DCMAKE_BUILD_TYPE=Debug \
       -DCMAKE_C_COMPILER="$CC" \
       -DCMAKE_CXX_COMPILER="$CXX" \
       "$SRC_DIR"

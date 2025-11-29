@@ -34,7 +34,7 @@ static NavSearchNode* NavSearchNode_Create(NavGraphNode n, NavSearchNode* parent
 typedef kvec_t(NavSearchNode) NavSearchNodeList;
 typedef kvec_t(NavSearchNode*) NavOpenNodeList;
 
-static NavSearchNodeList node_heap;
+static kvec_t(NavSearchNode*) node_heap;
 
 KHASH_INIT(NavSearchNodeSet, NavSearchNode*, char, false, NavSearchNode_Hash, NavSearchNode_Equal)
 
@@ -140,20 +140,17 @@ static int Navigation_Hueristic(Coordinates c0, Coordinates c1) {
 }
 
 static NavSearchNode* NavSearchNode_Create(NavGraphNode graph_node, NavSearchNode* parent, Coordinates target_coords) {
-    int g = parent ? parent->g + 1 : 0;
-    int h = Navigation_Hueristic(graph_node.coords, target_coords);
+    NavSearchNode* search_node = malloc(sizeof(NavSearchNode));
+    kv_push(NavSearchNode*, node_heap, search_node);
     
-    NavSearchNode search_node = (NavSearchNode) {
-        .g = g,
-        .h = h,
-        .f = g + h,
-        .parent = parent,
-        .coords = graph_node.coords,
-    };
+    
+    search_node->g = parent ? parent->g + 1 : 0;
+    search_node->h = Navigation_Hueristic(graph_node.coords, target_coords);
+    search_node->f = search_node->g + search_node->h;
+    search_node->parent = parent;
+    search_node->coords = graph_node.coords;
 
-    kv_push(NavSearchNode, node_heap, search_node);
-
-    return &kv_A(node_heap, kv_size(node_heap) - 1);
+    return search_node;
 }
 
 static inline khint_t NavSearchNode_Hash(NavSearchNode* node) {
@@ -176,6 +173,8 @@ static inline int NavSearchNode_Equal(NavSearchNode* a, NavSearchNode* b) {
 static inline void Navigation_Free(NavOpenNodeList* open, khash_t(NavSearchNodeSet)** closed) {
     kh_destroy(NavSearchNodeSet, *closed);
     kv_destroy(*open);
+    for (size_t i = 0; i < kv_size(node_heap); i++) 
+        free(kv_A(node_heap, i));
 }
 
 static inline NavPath Navigation_GenerateNavPath(NavSearchNode* last_node) {

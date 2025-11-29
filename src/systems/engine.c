@@ -12,6 +12,7 @@
 
 struct {
     Scene scene;
+    GameState game_state;
 } engine;
 
 // TODO: Temp remove
@@ -49,13 +50,13 @@ void Engine_Init() {
     Renderer_Init();
     MessageLog_Init();
     Navigation_Init();
-    
-    // TODO: Set gamestate
-    // engine.scene = NULL;
+    Engine_SetGameState(GS_MENU);
 }
 
 void Engine_LoadScene(int id) {
     Scene_Init(&engine.scene);
+
+    if (id) return;
 
     // TODO: REMOVE Mock setup map ------------------------
     for (int y = 0; y < engine.scene.map.height; y++) {
@@ -94,16 +95,38 @@ void Engine_LoadScene(int id) {
 
     SceneCamera_Init();
     SceneCamera_SetPosition((Vector2){0, -130});
+
+    Engine_SetGameState(GS_GAME);
 }
 
 void Engine_Run() {
-    float delta = GetFrameTime();
-
     MouseManager_TakeInput();
 
-    EntityManager_Tick(&engine.scene);
+    switch(Engine_GetGameState()) {
+        case GS_MENU:
+            // TEMP    
+            Engine_LoadScene(0);
+        break;
+        case GS_GAME:
+            EntityManager_Tick(&engine.scene);
+        break;
+        case GS_COUNT:
+        break;
+    }
+
 
     Renderer_Render();
 }
 
 Scene* Engine_GetScene() { return &engine.scene; }
+
+void Engine_SetGameState(GameState next_state) {
+    if (next_state == GS_GAME) {
+        // DO cool
+    }
+    engine.game_state = next_state; 
+}
+
+GameState Engine_GetGameState() {
+    return engine.game_state;
+}

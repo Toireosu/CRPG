@@ -12,6 +12,7 @@
 #include "raymath.h"
 #include "data/scene.h"
 #include "systems/engine.h"
+#include <stdio.h>
 
 struct {
     void* last_hovered;
@@ -27,8 +28,6 @@ static bool MouseManager_Hover(void* hovered) {
 }
 
 static bool MouseManager_HandleEntities() {
-    // if (!game->scene) return false;
-
     const Scene* scene = Engine_GetScene();
 
     for (int i = 0; i < scene->entities_count; i++) {
@@ -50,8 +49,6 @@ static bool MouseManager_HandleEntities() {
 #define SCROLL_SPEED 40
 
 static bool MouseManager_ScrollScreen() {
-    // TODO: Check if we are in scene gamestate
-    // if (!game->scene) return false;
     bool ret = false;
     Vector2 mouse_position = GetMousePosition();
     if (mouse_position.x < SCROLL_FIELD_SIZE) {
@@ -79,12 +76,21 @@ static bool MouseManager_ScrollScreen() {
 void MouseManager_TakeInput() {
     // Loop over all entities to check for input
 
-    if (CharacterController_TakeInput())
-        return;
-
-    if (MouseManager_ScrollScreen())
-        return;
-
-    if (MouseManager_HandleEntities())
-        return;
+    switch (Engine_GetGameState()) {
+        case GS_MENU:
+        break;
+        case GS_GAME:
+            if (CharacterController_TakeInput())
+                return;
+        
+            if (MouseManager_ScrollScreen())
+                return;
+        
+            if (MouseManager_HandleEntities())
+                return;
+        break;
+        case GS_COUNT:
+        default:
+        break;
+    }
 }
