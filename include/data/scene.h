@@ -3,6 +3,7 @@
 
 #define SCENE_MAX_ENTITY_COUNT 100
 
+#include "kvec.h"
 #include "entity.h"
 #include "map.h"
 /**
@@ -39,5 +40,18 @@ Entity* Scene_CreateEntity(Scene* scene);
  * @note The player must also be added using CreateEntity for the scene logic to work.
  */
 void Scene_SetPlayer(Scene* scene, Entity* entity);
+
+typedef kvec_t(Entity*) EntityVector;
+
+// Must call kv_destroy after use
+/**
+ * @brief Gets all entities in given circle of scene (map space).
+ * 
+ * @param scene The scene context.
+ * @param center The center of the circle.
+ * @param radius The radius of the circle.
+ * @note Units in map space. Must call kv_destroy after use.
+ */
+EntityVector Scene_GetEntitiesArea(Scene* scene, Vector2 center, float radius);
 
 #endif 
