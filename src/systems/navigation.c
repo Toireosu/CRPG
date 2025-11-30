@@ -216,8 +216,6 @@ NavPath Navigation_FindPath(Coordinates from, Coordinates to) {
         NavSearchNode* open_search_node = kv_pop(open);
         NavGraphNode current_m = *Navigation_GetGraphNodeRef(open_search_node->coords);
         
-        // open.a[0] = open.a[kv_size(open) - 1];
-        // kv_pop(open);
         int r;
         kh_put(NavSearchNodeSet, closed, open_search_node, &r);
         
