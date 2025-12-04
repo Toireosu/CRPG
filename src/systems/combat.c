@@ -68,6 +68,7 @@ void Combat_Start(Scene* scene, Entity* instigator) {
     combat.instigator = instigator;
     combat.is_combat = true;
     combat.turn_index = 0;
+    kv_size(combat.initiative) = 0;
 
     Combat_CollectInitiative(scene);
 }
@@ -80,6 +81,17 @@ void Combat_TryEnd() {
 
 void Combat_IsCombat() { return combat.is_combat; }
 
-bool Combat_BeginTurn(Entity* entity);
-bool Combat_ShouldTakeTurn(Entity* entity);
-bool Combat_EndTurn(Entity* entity);
+bool Combat_BeginTurn(Entity* entity) {
+    return true; 
+}
+
+bool Combat_ShouldTakeTurn(Entity* entity) {
+    return entity == kv_A(combat.initiative, combat.turn_index).entity;
+}
+
+bool Combat_EndTurn(Entity* entity) {
+    if (!Combat_ShouldTakeTurn(entity)) return false;
+
+    combat.turn_index % kv_size(combat.initiative);
+    return true;
+}

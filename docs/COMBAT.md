@@ -26,6 +26,7 @@
 ## Code
 
 * combat
+    * init()
     * start_combat(Entity*)
     * try_end_combat()
     * is_combat()
